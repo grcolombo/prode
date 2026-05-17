@@ -38,34 +38,44 @@ export default function Countdown() {
 
   if (!mounted) return null;
 
-  const isExpired = time.days === 0 && time.hours === 0 && time.minutes === 0 && time.seconds === 0;
+  const isExpired =
+    time.days === 0 &&
+    time.hours === 0 &&
+    time.minutes === 0 &&
+    time.seconds === 0;
 
   if (isExpired) {
     return (
-      <div className="text-center">
-        <p className="text-green-400 font-bold text-xl">¡El Mundial ya comenzó!</p>
-        <p className="text-gray-400 text-sm mt-1">Los pronósticos están cerrados</p>
-      </div>
+      <p className="text-brand-300 font-semibold text-base tracking-wide">
+        ¡El Mundial ya comenzó · Pronósticos cerrados!
+      </p>
     );
   }
 
   return (
-    <div className="text-center">
-      <p className="text-gray-400 text-sm uppercase tracking-widest mb-3">
-        Cierre de pronósticos en
+    <div className="flex flex-col items-center gap-3">
+      <p className="text-xs uppercase tracking-[0.2em] text-brand-400">
+        Pronósticos cierran en
       </p>
-      <div className="flex gap-3 justify-center">
+      <div className="flex gap-2">
         {[
           { value: time.days, label: "días" },
           { value: time.hours, label: "hs" },
           { value: time.minutes, label: "min" },
           { value: time.seconds, label: "seg" },
-        ].map(({ value, label }) => (
-          <div key={label} className="flex flex-col items-center">
-            <span className="bg-white/10 rounded-xl px-4 py-3 text-3xl font-bold tabular-nums min-w-[60px] text-center">
-              {pad(value)}
-            </span>
-            <span className="text-gray-500 text-xs mt-1">{label}</span>
+        ].map(({ value, label }, i) => (
+          <div key={label} className="flex items-center gap-2">
+            <div className="flex flex-col items-center">
+              <span className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-2xl sm:text-3xl font-bold tabular-nums min-w-[52px] text-center text-white">
+                {pad(value)}
+              </span>
+              <span className="text-brand-400 text-[10px] mt-1 uppercase tracking-widest">
+                {label}
+              </span>
+            </div>
+            {i < 3 && (
+              <span className="text-brand-600 text-2xl font-light mb-4">:</span>
+            )}
           </div>
         ))}
       </div>
