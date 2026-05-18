@@ -15,12 +15,12 @@ export default function Home() {
       <div className="relative flex flex-col h-full max-w-sm mx-auto w-full px-6 py-6 justify-between">
 
         {/* Header: Logo */}
-        <div>
+        <div className="flex justify-center">
           <Image
             src="/logo-blanco.png"
             alt="Tarifar"
-            width={120}
-            height={34}
+            width={180}
+            height={52}
             className="object-contain"
             priority
           />

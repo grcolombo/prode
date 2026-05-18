@@ -3,6 +3,18 @@
 
 ---
 
+## Pendiente de implementación (confirmado por usuario)
+
+- [ ] **Magic link (email)** como método de login alternativo para usuarios sin cuenta Google. Agregar campo de email + botón "Enviar link" en la landing page junto al botón de Google. Supabase: `supabase.auth.signInWithOtp({ email })`.
+
+---
+
+## Pendiente antes del lanzamiento (NO bloquea desarrollo)
+
+- [ ] **Publicar pantalla de consentimiento OAuth en Google Cloud Console** para que clientes externos puedan hacer login con Google. Actualmente el acceso está restringido solo a usuarios de la organización (@tarifar.com). Pasos: Google Cloud Console → APIs & Services → OAuth consent screen → Publish App → completar verificación si Google la requiere.
+
+---
+
 ## Pendiente de decisión del usuario (BLOQUEA desarrollo)
 
 - [ ] **Nombres de premios secundarios** con tinte argentino/gracioso (usuario los está pensando)

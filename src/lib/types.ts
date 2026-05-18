@@ -4,6 +4,9 @@ export type Stage = "group" | "r32" | "r16" | "qf" | "sf" | "third" | "final";
 
 export interface Database {
   public: {
+    Views: Record<string, never>;
+    Enums: Record<string, never>;
+    CompositeTypes: Record<string, never>;
     Tables: {
       profiles: {
         Row: {
@@ -25,6 +28,7 @@ export interface Database {
           role?: Role;
           is_admin?: boolean;
         };
+        Relationships: [];
       };
       matches: {
         Row: {
@@ -49,6 +53,7 @@ export interface Database {
           created_at?: string;
         };
         Update: Partial<Omit<Database["public"]["Tables"]["matches"]["Row"], "id" | "created_at">>;
+        Relationships: [];
       };
       predictions: {
         Row: {
@@ -73,11 +78,13 @@ export interface Database {
           away_score?: number;
           points_earned?: number | null;
         };
+        Relationships: [];
       };
       employee_emails: {
         Row: { email: string };
         Insert: { email: string };
         Update: { email?: string };
+        Relationships: [];
       };
     };
     Functions: {
