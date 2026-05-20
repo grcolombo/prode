@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Countdown from "@/components/Countdown";
 import GoogleSignInButton from "@/components/GoogleSignInButton";
+import MagicLinkForm from "@/components/MagicLinkForm";
 
 export default function Home() {
   return (
@@ -51,11 +52,31 @@ export default function Home() {
         <Countdown />
 
         {/* CTA */}
-        <div className="flex flex-col gap-2">
-          <GoogleSignInButton />
-          <p className="text-center text-[#4c2a8a] text-xs">
-            Ingresá con tu cuenta de Google
-          </p>
+        <div className="flex flex-col gap-4">
+
+          {/* Google */}
+          <div className="flex flex-col gap-1.5">
+            <p className="text-[#9b6ee0] text-xs font-semibold text-center">
+              Si tenés Gmail
+            </p>
+            <GoogleSignInButton />
+          </div>
+
+          {/* Divider */}
+          <div className="flex items-center gap-3">
+            <div className="flex-1 h-px bg-white/5" />
+            <span className="text-[#2d1a5e] text-xs">o</span>
+            <div className="flex-1 h-px bg-white/5" />
+          </div>
+
+          {/* Magic link */}
+          <div className="flex flex-col gap-1.5">
+            <p className="text-[#9b6ee0] text-xs font-semibold text-center">
+              Si tenés otra cuenta de mail
+            </p>
+            <MagicLinkForm />
+          </div>
+
         </div>
 
         {/* Footer */}
