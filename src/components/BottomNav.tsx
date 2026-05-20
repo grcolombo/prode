@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 
 const NAV_ITEMS = [
   {
@@ -50,10 +51,17 @@ const NAV_ITEMS = [
 
 export default function BottomNav() {
   const pathname = usePathname();
+  const router = useRouter();
+
+  async function handleLogout() {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.push("/");
+  }
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-[#0d0720] border-t border-[#1e0e42]">
-      <div className="max-w-sm mx-auto flex">
+      <div className="max-w-sm mx-auto flex items-stretch">
         {NAV_ITEMS.map(({ href, label, icon }) => {
           const active = pathname.startsWith(href);
           return (
@@ -72,6 +80,22 @@ export default function BottomNav() {
             </Link>
           );
         })}
+
+        {/* Separador + logout */}
+        <div className="flex items-center">
+          <div className="w-px h-6 bg-[#1e0e42]" />
+        </div>
+        <button
+          onClick={handleLogout}
+          className="px-4 flex flex-col items-center justify-center gap-1 text-[#2d1a5e] hover:text-red-400 transition-colors"
+          title="Cerrar sesión"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+            <polyline points="16 17 21 12 16 7" />
+            <line x1="21" y1="12" x2="9" y2="12" />
+          </svg>
+        </button>
       </div>
     </nav>
   );
