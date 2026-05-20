@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import Flag from "@/components/Flag";
 
 type User = { id: string; alias: string; role: string };
 type Match = {
@@ -11,12 +12,6 @@ type Match = {
   away_score_real: number | null; is_played: boolean;
 };
 type Prediction = { match_id: number; home_score: number; away_score: number; points_earned: number | null };
-
-function Flag({ code }: { code: string | null }) {
-  if (!code) return null;
-  const iso = code.split("").map(c => String.fromCodePoint(c.codePointAt(0)! - 0x1f1e6 + 65)).join("").toLowerCase();
-  return <img src={`https://flagcdn.com/w20/${iso}.png`} alt={iso} width={16} height={12} className="inline-block rounded-sm" />;
-}
 
 function PointsBadge({ points }: { points: number | null }) {
   if (points === null) return <span className="text-[#2d1a5e] text-xs">—</span>;

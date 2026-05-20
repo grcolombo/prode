@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import BottomNav from "@/components/BottomNav";
+import Flag from "@/components/Flag";
 
 type PredictionRow = {
   match_id: number;
@@ -18,24 +19,6 @@ type PredictionRow = {
   away_score: number | null;
   points_earned: number | null;
 };
-
-function Flag({ code }: { code: string | null }) {
-  if (!code) return <span className="w-5 h-5 inline-block" />;
-  const iso = code
-    .split("")
-    .map((c) => String.fromCodePoint(c.codePointAt(0)! - 0x1f1e6 + 65))
-    .join("")
-    .toLowerCase();
-  return (
-    <img
-      src={`https://flagcdn.com/w20/${iso}.png`}
-      alt={iso}
-      width={20}
-      height={15}
-      className="inline-block rounded-sm"
-    />
-  );
-}
 
 function PointsBadge({ points }: { points: number | null }) {
   if (points === null) return null;
