@@ -34,10 +34,18 @@ export default function OnboardingForm() {
     }
 
     setStatus("saving");
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+      setErrorMsg("Sesión inválida. Volvé a ingresar.");
+      setStatus("error");
+      return;
+    }
+
     const { error } = await supabase
       .from("profiles")
       .update({ alias: alias.trim() })
-      .eq("id", (await supabase.auth.getUser()).data.user!.id);
+      .eq("id", user.id);
 
     if (error) {
       setErrorMsg("Ocurrió un error. Intentá de nuevo.");

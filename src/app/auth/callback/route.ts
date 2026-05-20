@@ -30,6 +30,7 @@ export async function GET(request: NextRequest) {
     if (!error) {
       return NextResponse.redirect(`${origin}${next}`);
     }
+    return NextResponse.redirect(`${origin}/?error=auth`);
   }
 
   return NextResponse.redirect(`${origin}/?error=auth`);
