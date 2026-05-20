@@ -7,35 +7,35 @@ export default function Home() {
   return (
     <main className="relative h-screen bg-[#0a0614] text-white flex flex-col overflow-hidden">
 
-      {/* Gradientes de fondo */}
+      {/* Gradientes */}
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[500px] h-[500px] rounded-full bg-[#2d1a5e]/50 blur-[100px]" />
         <div className="absolute bottom-[-10%] right-[-5%] w-[300px] h-[300px] rounded-full bg-[#4c2a8a]/20 blur-[80px]" />
       </div>
 
-      <div className="relative flex flex-col h-full max-w-sm mx-auto w-full px-6 py-6 justify-between">
+      <div className="relative flex flex-col h-full max-w-sm mx-auto w-full px-6 py-4 justify-between">
 
-        {/* Header: Logo */}
+        {/* Header: Logo Tarifar — protagonista */}
         <div className="flex justify-center">
           <Image
             src="/logo-blanco.png"
             alt="Tarifar"
-            width={180}
-            height={52}
+            width={220}
+            height={64}
             className="object-contain"
             priority
           />
         </div>
 
-        {/* Centro: imagen + título */}
-        <div className="flex flex-col items-center gap-3">
+        {/* Centro: copa + título */}
+        <div className="flex flex-col items-center gap-2">
           <div className="relative">
             <div className="absolute inset-0 bg-[#6b3db8]/25 blur-2xl scale-110 rounded-full" />
             <Image
               src="/fifa-wc-2026.png"
               alt="FIFA World Cup 2026"
-              width={160}
-              height={200}
+              width={120}
+              height={150}
               className="relative mix-blend-screen"
               priority
             />
@@ -51,15 +51,15 @@ export default function Home() {
         {/* Countdown */}
         <Countdown />
 
-        {/* CTA */}
-        <div className="flex flex-col gap-4">
+        {/* CTA — compacto */}
+        <div className="flex flex-col gap-2.5">
 
           {/* Google */}
-          <div className="flex flex-col gap-1.5">
-            <p className="text-[#9b6ee0] text-xs font-semibold text-center">
+          <div className="flex flex-col gap-1">
+            <p className="text-[#9b6ee0] text-[11px] font-semibold text-center">
               Si tenés Gmail
             </p>
-            <GoogleSignInButton />
+            <GoogleSignInButton compact />
           </div>
 
           {/* Divider */}
@@ -70,11 +70,11 @@ export default function Home() {
           </div>
 
           {/* Magic link */}
-          <div className="flex flex-col gap-1.5">
-            <p className="text-[#9b6ee0] text-xs font-semibold text-center">
+          <div className="flex flex-col gap-1">
+            <p className="text-[#9b6ee0] text-[11px] font-semibold text-center">
               Si tenés otra cuenta de mail
             </p>
-            <MagicLinkForm />
+            <MagicLinkForm compact />
           </div>
 
         </div>
