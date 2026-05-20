@@ -1,15 +1,12 @@
 import { createClient } from "@/lib/supabase/server";
+import Link from "next/link";
 
 type RankingRow = {
   alias: string;
   total_points: number;
   exact_results: number;
+  user_id: string;
 };
-
-async function getRanking(supabase: Awaited<ReturnType<typeof createClient>>, role: string) {
-  const { data } = await supabase.rpc("get_ranking", { p_role: role });
-  return (data ?? []) as RankingRow[];
-}
 
 const posColors = ["text-yellow-400", "text-slate-300", "text-amber-600"];
 const posLabels = ["1°", "2°", "3°"];
@@ -26,16 +23,23 @@ function RankingTable({ rows, title }: { rows: RankingRow[]; title: string }) {
             const pos = i + 1;
             const isTop3 = pos <= 3;
             return (
-              <div key={row.alias} className="flex items-center gap-3 bg-[#110828] border border-[#1e0e42] rounded-xl px-4 py-2.5">
+              <Link
+                key={row.alias}
+                href={`/admin/usuarios?user_id=${row.user_id}`}
+                className="flex items-center gap-3 bg-[#110828] border border-[#1e0e42] rounded-xl px-4 py-2.5 hover:bg-[#1a0a3e] hover:border-[#2d1a5e] transition-colors"
+              >
                 <span className={`w-7 shrink-0 text-center text-sm font-black ${isTop3 ? posColors[pos - 1] : "text-[#4c2a8a]"}`}>
                   {isTop3 ? posLabels[pos - 1] : `${pos}`}
                 </span>
                 <span className="flex-1 text-sm text-[#d4c0f0] font-semibold truncate">{row.alias}</span>
-                <div className="text-right shrink-0">
-                  <span className="text-white font-black">{row.total_points}</span>
-                  <span className="text-[#4c2a8a] text-[10px] ml-1.5">{row.exact_results} ex</span>
+                <div className="text-right shrink-0 flex items-center gap-2">
+                  <div>
+                    <span className="text-white font-black">{row.total_points}</span>
+                    <span className="text-[#4c2a8a] text-[10px] ml-1.5">{row.exact_results} ex</span>
+                  </div>
+                  <span className="text-[#2d1a5e] text-xs">›</span>
                 </div>
-              </div>
+              </Link>
             );
           })}
         </div>
@@ -47,10 +51,21 @@ function RankingTable({ rows, title }: { rows: RankingRow[]; title: string }) {
 export default async function AdminRankingPage() {
   const supabase = await createClient();
 
-  const [employees, clients] = await Promise.all([
-    getRanking(supabase, "employee"),
-    getRanking(supabase, "client"),
+  // Fetch ranking + mapeo alias → user_id en paralelo
+  const [{ data: empRanking }, { data: cliRanking }, { data: profiles }] = await Promise.all([
+    supabase.rpc("get_ranking", { p_role: "employee" }),
+    supabase.rpc("get_ranking", { p_role: "client" }),
+    supabase.from("profiles").select("id, alias").not("alias", "is", null),
   ]);
+
+  const aliasToId = new Map((profiles ?? []).map(p => [p.alias, p.id]));
+
+  function enrichRows(rows: { alias: string; total_points: number; exact_results: number }[]): RankingRow[] {
+    return (rows ?? []).map(r => ({ ...r, user_id: aliasToId.get(r.alias) ?? "" }));
+  }
+
+  const employees = enrichRows(empRanking ?? []);
+  const clients = enrichRows(cliRanking ?? []);
 
   return (
     <div className="flex flex-col gap-8">
