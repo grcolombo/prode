@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { acceptTerms } from "@/app/fixture/actions";
 
@@ -21,12 +22,18 @@ export default function TermsOverlay({ isRezagado }: Props) {
       <div className="w-full max-w-sm bg-[#110828] border border-[#2d1a5e] rounded-2xl flex flex-col gap-5 p-6 max-h-[90vh] overflow-y-auto">
 
         {/* Header */}
-        <div className="flex flex-col gap-1">
-          <div className="text-3xl">⚽</div>
-          <h1 className="text-xl font-black tracking-tight">
+        <div className="flex flex-col gap-2">
+          <Image
+            src="/logo-blanco.png"
+            alt="Tarifar"
+            width={120}
+            height={40}
+            className="object-contain object-left"
+          />
+          <h1 className="text-xl font-black tracking-tight text-white">
             {isRezagado ? "¡Bienvenido, Rezagado!" : "¡Bienvenido al Prode Tarifar!"}
           </h1>
-          <p className="text-[#9b6ee0] text-sm">
+          <p className="text-slate-300 text-sm">
             {isRezagado
               ? "Te uniste después del inicio del torneo. Competís en tu propia tabla."
               : "Mundial 2026 · Pronosticá todos los partidos y ganá."}
@@ -47,7 +54,7 @@ export default function TermsOverlay({ isRezagado }: Props) {
 
         {/* Resumen de reglas */}
         <div className="flex flex-col gap-2">
-          <h2 className="text-xs font-bold text-[#9b6ee0] uppercase tracking-wider">Cómo se puntúa</h2>
+          <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Cómo se puntúa</h2>
           <div className="flex flex-col gap-1.5">
             {[
               { pts: "12 pts", label: "Resultado exacto (ej: 2-1 = 2-1)" },
@@ -56,8 +63,8 @@ export default function TermsOverlay({ isRezagado }: Props) {
               { pts: "2 pts",  label: "Acertás goles del visitante" },
             ].map(({ pts, label }) => (
               <div key={pts} className="flex items-center gap-3">
-                <span className="text-white font-black text-sm w-12 shrink-0 text-right">{pts}</span>
-                <span className="text-slate-300 text-sm">{label}</span>
+                <span className="text-white font-black text-sm w-14 shrink-0 text-right">{pts}</span>
+                <span className="text-slate-200 text-sm">{label}</span>
               </div>
             ))}
           </div>
@@ -72,7 +79,7 @@ export default function TermsOverlay({ isRezagado }: Props) {
         {/* Redes sociales */}
         <div className="bg-[#1a0a3e] border border-[#2d1a5e] rounded-xl px-4 py-3 flex items-center gap-3">
           <span className="text-2xl shrink-0">📸</span>
-          <p className="text-slate-300 text-sm">
+          <p className="text-slate-200 text-sm">
             Seguinos en Instagram — publicamos el ranking de posiciones todos los días.{" "}
             <a
               href="https://www.instagram.com/tarifarcomext"
