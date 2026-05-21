@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import FixtureClient from "./FixtureClient";
 import RealtimeRefresher from "@/components/RealtimeRefresher";
+import TermsOverlay from "@/components/TermsOverlay";
 
 const GROUP_DEADLINE = new Date("2026-06-11T19:00:00Z");
 
@@ -11,7 +12,8 @@ export default async function FixturePage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/");
 
-  const [{ data: matches }, { data: predictions }] = await Promise.all([
+  const [{ data: profile }, { data: matches }, { data: predictions }] = await Promise.all([
+    supabase.from("profiles").select("alias, accepted_terms, is_rezagado").eq("id", user.id).single(),
     supabase
       .from("matches")
       .select("id,stage,group_name,round,match_number,home_team,away_team,home_flag,away_flag,scheduled_at,home_score_real,away_score_real,is_played")
@@ -37,6 +39,9 @@ export default async function FixturePage() {
 
   return (
     <>
+      {!profile?.accepted_terms && (
+        <TermsOverlay isRezagado={profile?.is_rezagado ?? false} />
+      )}
       <RealtimeRefresher tables={["matches", "predictions"]} />
       <FixtureClient
         matches={matches ?? []}

@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import BottomNav from "@/components/BottomNav";
 import RealtimeRefresher from "@/components/RealtimeRefresher";
+import TermsOverlay from "@/components/TermsOverlay";
 
 const DEADLINE = new Date("2026-06-11T19:00:00Z");
 
@@ -24,17 +25,21 @@ export default async function RankingPage() {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("alias, role")
+    .select("alias, role, is_rezagado, accepted_terms")
     .eq("id", user.id)
     .single();
 
   if (!profile?.alias) redirect("/onboarding");
 
-  const { data: ranking } = await supabase.rpc("get_ranking", {
-    p_role: profile.role,
-  });
+  const [{ data: ranking }, { data: rezagadosRanking }] = await Promise.all([
+    supabase.rpc("get_ranking", { p_role: profile.role }),
+    profile.role === "client"
+      ? supabase.rpc("get_rezagados_ranking")
+      : Promise.resolve({ data: null }),
+  ]);
 
   const rows = (ranking ?? []) as RankingRow[];
+  const rezagadosRows = (rezagadosRanking ?? []) as { alias: string; total_points: number; exact_results: number }[];
   const title =
     profile.role === "employee" ? "Ranking Empleados" : "Ranking Clientes";
   const isPastDeadline = new Date() > DEADLINE;
@@ -165,8 +170,50 @@ export default async function RankingPage() {
             🔒 Podés ver los pronósticos de todos a partir del 11/06
           </p>
         )}
+
+        {/* Ranking Rezagados — solo clientes */}
+        {profile.role === "client" && rezagadosRows.length > 0 && (
+          <section className="flex flex-col gap-3 pt-2">
+            <div>
+              <h2 className="text-lg font-black tracking-tight">Tabla Rezagados</h2>
+              <p className="text-[#9b6ee0] text-xs mt-0.5">Solo cuentan puntos de R32 en adelante</p>
+            </div>
+            <div className="flex flex-col gap-2">
+              {rezagadosRows.map((row, i) => {
+                const pos = i + 1;
+                const isTop3 = pos <= 3;
+                const posColors = ["text-yellow-400", "text-slate-300", "text-amber-600"];
+                const posLabels = ["1°", "2°", "3°"];
+                const isMe = row.alias === profile.alias;
+                return (
+                  <div
+                    key={row.alias}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl border ${
+                      isMe ? "bg-[#2d1a5e] border-[#6b3db8]" : "bg-[#110828] border-[#1e0e42]"
+                    }`}
+                  >
+                    <span className={`w-8 shrink-0 text-center text-base font-black ${isTop3 ? posColors[pos - 1] : "text-[#4c2a8a]"}`}>
+                      {isTop3 ? posLabels[pos - 1] : `${pos}`}
+                    </span>
+                    <span className={`flex-1 font-semibold text-sm truncate ${isMe ? "text-white" : "text-[#d4c0f0]"}`}>
+                      {row.alias}
+                      {isMe && <span className="ml-2 text-[#9b6ee0] text-xs font-normal">(vos)</span>}
+                    </span>
+                    <div className="text-right shrink-0">
+                      <div className="text-white font-black text-lg leading-none">{row.total_points}</div>
+                      <div className="text-[#4c2a8a] text-[10px]">{row.exact_results} {row.exact_results === 1 ? "exacto" : "exactos"}</div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        )}
       </div>
 
+      {!profile.accepted_terms && (
+        <TermsOverlay isRezagado={profile.is_rezagado ?? false} />
+      )}
       <RealtimeRefresher tables={["matches", "predictions"]} />
       <BottomNav />
     </main>

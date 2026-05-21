@@ -1,6 +1,19 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { revalidatePath } from "next/cache";
+
+export async function acceptTerms() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return;
+  await supabase
+    .from("profiles")
+    .update({ accepted_terms: true })
+    .eq("id", user.id);
+  revalidatePath("/fixture");
+  revalidatePath("/ranking");
+}
 
 // Deadline global: inicio del primer partido de la fase de grupos
 const GROUP_DEADLINE = new Date("2026-06-11T19:00:00Z");
