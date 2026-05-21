@@ -28,7 +28,7 @@ export default function TermsOverlay({ isRezagado }: Props) {
             alt="Tarifar"
             width={200}
             height={64}
-            className="object-contain object-left"
+            className="object-contain mx-auto"
           />
           <h1 className="text-base font-bold tracking-tight text-white">
             {isRezagado ? "¡Bienvenido, Rezagado!" : "¡Bienvenido al Prode Tarifar!"}
@@ -57,12 +57,12 @@ export default function TermsOverlay({ isRezagado }: Props) {
           <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Cómo se puntúa</h2>
           <div className="flex flex-col gap-1.5">
             {[
-              { pts: "12 pts", label: "Resultado exacto (ej: 2-1 = 2-1)" },
-              { pts: "5 pts",  label: "Acertás ganador o empate" },
-              { pts: "2 pts",  label: "Acertás goles del local" },
-              { pts: "2 pts",  label: "Acertás goles del visitante" },
-            ].map(({ pts, label }) => (
-              <div key={pts} className="flex items-center gap-3">
+              { key: "exacto",    pts: "12 pts", label: "Resultado exacto (ej: 2-1 = 2-1)" },
+              { key: "ganador",   pts: "5 pts",  label: "Acertás ganador o empate" },
+              { key: "local",     pts: "2 pts",  label: "Acertás goles del local" },
+              { key: "visitante", pts: "2 pts",  label: "Acertás goles del visitante" },
+            ].map(({ key, pts, label }) => (
+              <div key={key} className="flex items-center gap-3">
                 <span className="text-white font-black text-sm w-14 shrink-0 text-right">{pts}</span>
                 <span className="text-slate-200 text-sm">{label}</span>
               </div>
