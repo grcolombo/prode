@@ -100,7 +100,8 @@ export default async function PronosticosAjenosPage({
     .order("scheduled_at", { ascending: true });
 
   type PredRow = { match_id: number; home_score: number; away_score: number; points_earned: number | null };
-  const predMap = new Map((predictions ?? []).map((p: PredRow) => [p.match_id, p]));
+  const preds: PredRow[] = predictions ?? [];
+  const predMap = new Map(preds.map((p) => [p.match_id, p]));
 
   const allRows = (matches ?? []).map((m) => {
     const pred = predMap.get(m.id);
@@ -110,9 +111,9 @@ export default async function PronosticosAjenosPage({
   const playedRows = allRows.filter((r) => r.is_played);
   const pendingRows = allRows.filter((r) => !r.is_played);
 
-  const totalPoints = (predictions ?? []).reduce((s, p) => s + (p.points_earned ?? 0), 0);
-  const exactos = (predictions ?? []).filter((p) => p.points_earned === 12).length;
-  const filled = (predictions ?? []).length;
+  const totalPoints = preds.reduce((s: number, p: PredRow) => s + (p.points_earned ?? 0), 0);
+  const exactos = preds.filter((p: PredRow) => p.points_earned === 12).length;
+  const filled = preds.length;
 
   return (
     <main className="relative min-h-screen bg-[#0a0614] text-white pb-16">
