@@ -3,6 +3,8 @@ import { redirect } from "next/navigation";
 import FixtureClient from "./FixtureClient";
 import RealtimeRefresher from "@/components/RealtimeRefresher";
 
+const GROUP_DEADLINE = new Date("2026-06-11T19:00:00Z");
+
 export default async function FixturePage() {
   const supabase = await createClient();
 
@@ -22,12 +24,24 @@ export default async function FixturePage() {
       .eq("user_id", user.id),
   ]);
 
+  // Calcular deadline por fase eliminatoria (primer partido de cada fase)
+  const now = new Date();
+  const stageDeadlines: Record<string, boolean> = { group: now >= GROUP_DEADLINE };
+  const knockoutStages = ["R32", "R16", "QF", "SF", "final"];
+  for (const stage of knockoutStages) {
+    const first = (matches ?? [])
+      .filter(m => m.stage === stage)
+      .sort((a, b) => new Date(a.scheduled_at).getTime() - new Date(b.scheduled_at).getTime())[0];
+    stageDeadlines[stage] = first ? now >= new Date(first.scheduled_at) : false;
+  }
+
   return (
     <>
       <RealtimeRefresher tables={["matches", "predictions"]} />
       <FixtureClient
         matches={matches ?? []}
         predictions={predictions ?? []}
+        stageDeadlines={stageDeadlines}
       />
     </>
   );

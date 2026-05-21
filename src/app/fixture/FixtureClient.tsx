@@ -33,11 +33,12 @@ type Prediction = {
 type Props = {
   matches: Match[];
   predictions: Prediction[];
+  stageDeadlines: Record<string, boolean>;
 };
 
-export default function FixtureClient({ matches, predictions }: Props) {
+export default function FixtureClient({ matches, predictions, stageDeadlines }: Props) {
   const [activeGroup, setActiveGroup] = useState("A");
-  const isPastDeadline = new Date() > DEADLINE;
+  const isPastDeadline = stageDeadlines["group"] ?? (new Date() > DEADLINE);
 
   const predMap = Object.fromEntries(predictions.map(p => [p.match_id, p]));
 
@@ -108,13 +109,57 @@ export default function FixtureClient({ matches, predictions }: Props) {
           </div>
         ))}
 
-        {/* Knockout placeholder */}
-        {knockoutMatches.length === 0 && (
+        {/* Knockout matches */}
+        {knockoutMatches.length === 0 ? (
           <div className="mt-6 rounded-2xl border border-white/5 bg-white/[0.02] px-4 py-5 text-center">
             <p className="text-white/30 text-sm">Fase eliminatoria</p>
             <p className="text-[#4c2a8a] text-xs mt-1">Disponible tras la fase de grupos</p>
           </div>
-        )}
+        ) : (() => {
+          const stageOrder = ["R32", "R16", "QF", "SF", "final"];
+          const stageLabels: Record<string, string> = {
+            R32: "Ronda de 32",
+            R16: "Octavos de Final",
+            QF: "Cuartos de Final",
+            SF: "Semifinales",
+            final: "Final",
+          };
+          const byStage: Record<string, Match[]> = {};
+          for (const m of knockoutMatches) {
+            if (!byStage[m.stage]) byStage[m.stage] = [];
+            byStage[m.stage].push(m);
+          }
+          return stageOrder.filter(s => byStage[s]).map(stage => {
+            const locked = stageDeadlines[stage] ?? false;
+            const deadline = !locked
+              ? byStage[stage].sort((a, b) =>
+                  new Date(a.scheduled_at).getTime() - new Date(b.scheduled_at).getTime()
+                )[0]?.scheduled_at
+              : null;
+            return (
+              <div key={stage} className="mt-6 space-y-3">
+                <div className="flex items-center justify-between">
+                  <p className="text-[#4c2a8a] text-[10px] font-bold uppercase tracking-widest">
+                    {stageLabels[stage] ?? stage}
+                  </p>
+                  <span className={`text-[10px] font-medium ${locked ? "text-red-400/70" : "text-[#9b6ee0]"}`}>
+                    {locked ? "🔒 Cerrado" : deadline ? `● Cierra ${new Date(deadline).toLocaleDateString("es-AR", { day: "2-digit", month: "2-digit", timeZone: "America/Argentina/Buenos_Aires" })}` : ""}
+                  </span>
+                </div>
+                <div className="space-y-2">
+                  {byStage[stage].map(m => (
+                    <MatchCard
+                      key={m.id}
+                      match={m}
+                      prediction={predMap[m.id] ?? null}
+                      locked={locked}
+                    />
+                  ))}
+                </div>
+              </div>
+            );
+          });
+        })()}
       </div>
 
       <BottomNav />

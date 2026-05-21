@@ -27,7 +27,7 @@ function formatDate(iso: string) {
 
 function stageLabel(stage: string, group: string | null) {
   if (stage === "group") return `Grupo ${group}`;
-  const map: Record<string, string> = { r32: "Ronda 32", r16: "Octavos", qf: "Cuartos", sf: "Semis", third: "3er puesto", final: "Final" };
+  const map: Record<string, string> = { R32: "Ronda de 32", R16: "Octavos", QF: "Cuartos", SF: "Semis", final: "Final" };
   return map[stage] ?? stage;
 }
 
@@ -39,6 +39,9 @@ function MatchRow({ match }: { match: Match }) {
   const [error, setError] = useState("");
 
   const hasTeams = match.home_team && match.away_team;
+  const isEditing = match.is_played &&
+    (home !== (match.home_score_real?.toString() ?? "") ||
+     away !== (match.away_score_real?.toString() ?? ""));
 
   async function handleSave() {
     const h = parseInt(home);
@@ -47,12 +50,19 @@ function MatchRow({ match }: { match: Match }) {
       setError("Scores inválidos");
       return;
     }
+    // Confirmación si se está editando un resultado ya cargado
+    if (match.is_played) {
+      const ok = window.confirm(
+        `¿Confirmar corrección del resultado?\n\nAnterior: ${match.home_score_real}-${match.away_score_real}\nNuevo: ${h}-${a}\n\nEsto recalculará los puntos de todos los participantes.`
+      );
+      if (!ok) return;
+    }
     setLoading(true);
     setError("");
     try {
       await saveResult(match.id, h, a);
       setSaved(true);
-      setTimeout(() => setSaved(false), 2000);
+      setTimeout(() => setSaved(false), 2500);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Error");
     } finally {
@@ -61,6 +71,8 @@ function MatchRow({ match }: { match: Match }) {
   }
 
   async function handleUnmark() {
+    const ok = window.confirm("¿Desmarcar como jugado? Se borrarán los puntos calculados.");
+    if (!ok) return;
     setLoading(true);
     try {
       await unmarkPlayed(match.id);
@@ -72,57 +84,54 @@ function MatchRow({ match }: { match: Match }) {
   }
 
   return (
-    <div className={`bg-[#110828] border rounded-xl px-4 py-3 flex flex-col gap-2 ${match.is_played ? "border-green-800/40" : "border-[#1e0e42]"}`}>
+    <div className={`bg-[#110828] border rounded-xl px-4 py-3 flex flex-col gap-2 ${
+      isEditing ? "border-yellow-600/50" : match.is_played ? "border-green-800/40" : "border-[#1e0e42]"
+    }`}>
       <div className="flex items-center justify-between">
         <span className="text-[10px] text-[#4c2a8a] font-bold uppercase tracking-wider">
           {stageLabel(match.stage, match.group_name)} · {formatDate(match.scheduled_at)}
         </span>
-        {match.is_played && (
-          <span className="text-[10px] text-green-400 font-bold">Jugado</span>
-        )}
+        <div className="flex items-center gap-2">
+          {isEditing && (
+            <span className="text-[10px] text-yellow-400 font-bold">Editando</span>
+          )}
+          {match.is_played && !isEditing && (
+            <span className="text-[10px] text-green-400 font-bold">✓ Cargado</span>
+          )}
+        </div>
       </div>
 
       <div className="flex items-center gap-3">
-        {/* Equipos */}
         <div className="flex-1 min-w-0">
           <p className="text-sm font-semibold truncate">{match.home_team ?? <span className="text-[#4c2a8a]">TBD</span>}</p>
           <p className="text-sm font-semibold truncate">{match.away_team ?? <span className="text-[#4c2a8a]">TBD</span>}</p>
         </div>
 
-        {/* Score inputs */}
         {hasTeams ? (
           <div className="flex items-center gap-2 shrink-0">
             <input
-              type="number"
-              min={0}
-              max={99}
-              value={home}
+              type="number" min={0} max={99} value={home}
               onChange={e => setHome(e.target.value)}
-              disabled={loading}
-              placeholder="—"
+              disabled={loading} placeholder="—"
               className="w-12 text-center bg-[#0a0614] border border-[#2d1a5e] rounded-lg py-1.5 text-white font-bold text-sm focus:outline-none focus:border-[#6b3db8] disabled:opacity-50"
             />
             <span className="text-[#4c2a8a] font-bold">:</span>
             <input
-              type="number"
-              min={0}
-              max={99}
-              value={away}
+              type="number" min={0} max={99} value={away}
               onChange={e => setAway(e.target.value)}
-              disabled={loading}
-              placeholder="—"
+              disabled={loading} placeholder="—"
               className="w-12 text-center bg-[#0a0614] border border-[#2d1a5e] rounded-lg py-1.5 text-white font-bold text-sm focus:outline-none focus:border-[#6b3db8] disabled:opacity-50"
             />
             <button
               onClick={handleSave}
               disabled={loading || !home || !away}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors disabled:opacity-40 ${
-                saved
-                  ? "bg-green-600 text-white"
-                  : "bg-[#6b3db8] text-white hover:bg-[#7d4ed4]"
+                saved ? "bg-green-600 text-white" :
+                isEditing ? "bg-yellow-600 text-white hover:bg-yellow-500" :
+                "bg-[#6b3db8] text-white hover:bg-[#7d4ed4]"
               }`}
             >
-              {saved ? "OK" : loading ? "..." : "Guardar"}
+              {saved ? "✓ OK" : loading ? "..." : isEditing ? "Actualizar" : "Guardar"}
             </button>
             {match.is_played && (
               <button
