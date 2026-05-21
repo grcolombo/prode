@@ -26,11 +26,11 @@ export default function TermsOverlay({ isRezagado }: Props) {
           <Image
             src="/logo-blanco.png"
             alt="Tarifar"
-            width={120}
-            height={40}
+            width={200}
+            height={64}
             className="object-contain object-left"
           />
-          <h1 className="text-xl font-black tracking-tight text-white">
+          <h1 className="text-base font-bold tracking-tight text-white">
             {isRezagado ? "¡Bienvenido, Rezagado!" : "¡Bienvenido al Prode Tarifar!"}
           </h1>
           <p className="text-slate-300 text-sm">
