@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import BottomNav from "@/components/BottomNav";
 import Flag from "@/components/Flag";
+import RealtimeRefresher from "@/components/RealtimeRefresher";
 
 type PredictionRow = {
   match_id: number;
@@ -152,6 +153,7 @@ export default async function MisPronosticosPage() {
         )}
       </div>
 
+      <RealtimeRefresher tables={["matches", "predictions"]} />
       <BottomNav />
     </main>
   );

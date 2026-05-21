@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { savePrediction } from "./actions";
 
 const SUBDIVISION_FLAGS: Record<string, string> = {
   "🏴󠁧󠁢󠁳󠁣󠁴󠁿": "gb-sct",
@@ -78,16 +78,10 @@ export default function MatchCard({ match, prediction, locked }: Props) {
   async function handleSave() {
     if (!canSave) return;
     setStatus("saving");
-    const supabase = createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) { setStatus("error"); return; }
 
-    const { error } = await supabase.from("predictions").upsert(
-      { user_id: user.id, match_id: match.id, home_score: parseInt(home), away_score: parseInt(away) },
-      { onConflict: "user_id,match_id" }
-    );
+    const result = await savePrediction(match.id, parseInt(home), parseInt(away));
 
-    if (error) { setStatus("error"); return; }
+    if (result.error) { setStatus("error"); return; }
     setStatus("saved");
     setTimeout(() => setStatus("idle"), 2500);
   }
@@ -96,9 +90,20 @@ export default function MatchCard({ match, prediction, locked }: Props) {
 
   return (
     <div className={`rounded-2xl px-3 pt-2.5 pb-2 border transition-colors ${
-      hasPrediction ? "bg-[#160b2e] border-[#6b3db8]/40" : "bg-white/[0.03] border-white/5"
+      match.is_played
+        ? "bg-[#0a1a10]/60 border-[#1a3d25]/60"
+        : hasPrediction
+          ? "bg-[#160b2e] border-[#6b3db8]/40"
+          : "bg-white/[0.03] border-white/5"
     }`}>
-      <p className="text-[#4c2a8a] text-[10px] mb-2">{formatDate(match.scheduled_at)}</p>
+      <div className="flex items-center justify-between mb-2">
+        <p className="text-[#4c2a8a] text-[10px]">{formatDate(match.scheduled_at)}</p>
+        {match.is_played && (
+          <span className="text-[9px] font-bold uppercase tracking-wider text-green-500/70 bg-green-500/10 px-1.5 py-0.5 rounded-full">
+            FIN
+          </span>
+        )}
+      </div>
 
       <div className="flex items-center gap-2">
         {/* Home */}
@@ -113,11 +118,19 @@ export default function MatchCard({ match, prediction, locked }: Props) {
         <div className="flex items-center gap-1 shrink-0">
           {locked || match.is_played ? (
             <>
-              <span className="w-8 h-8 flex items-center justify-center bg-white/5 rounded-lg text-sm font-bold text-white/80">
+              <span className={`w-8 h-8 flex items-center justify-center rounded-lg font-black ${
+                match.is_played
+                  ? "bg-green-900/30 text-white text-base"
+                  : "bg-white/5 text-white/80 text-sm"
+              }`}>
                 {match.is_played ? match.home_score_real ?? "-" : (home || "-")}
               </span>
-              <span className="text-white/20 text-xs">:</span>
-              <span className="w-8 h-8 flex items-center justify-center bg-white/5 rounded-lg text-sm font-bold text-white/80">
+              <span className={`text-xs ${match.is_played ? "text-green-500/50" : "text-white/20"}`}>:</span>
+              <span className={`w-8 h-8 flex items-center justify-center rounded-lg font-black ${
+                match.is_played
+                  ? "bg-green-900/30 text-white text-base"
+                  : "bg-white/5 text-white/80 text-sm"
+              }`}>
                 {match.is_played ? match.away_score_real ?? "-" : (away || "-")}
               </span>
             </>
@@ -150,8 +163,14 @@ export default function MatchCard({ match, prediction, locked }: Props) {
       {/* Footer: save button or points */}
       <div className="mt-2 flex justify-center min-h-[20px]">
         {match.is_played && pts !== undefined && pts !== null ? (
-          <span className={`text-xs font-bold ${pts === 12 ? "text-yellow-400" : pts > 0 ? "text-green-400" : "text-white/25"}`}>
-            {pts} pts
+          <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
+            pts === 12
+              ? "bg-yellow-500/15 text-yellow-400"
+              : pts > 0
+                ? "bg-green-500/15 text-green-400"
+                : "text-white/20"
+          }`}>
+            {pts === 12 ? "⭐ 12 pts" : pts > 0 ? `+${pts} pts` : "0 pts"}
           </span>
         ) : !locked && !match.is_played ? (
           <button

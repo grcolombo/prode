@@ -1,6 +1,10 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import BottomNav from "@/components/BottomNav";
+import RealtimeRefresher from "@/components/RealtimeRefresher";
+
+const DEADLINE = new Date("2026-06-11T19:00:00Z");
 
 type RankingRow = {
   alias: string;
@@ -33,6 +37,10 @@ export default async function RankingPage() {
   const rows = (ranking ?? []) as RankingRow[];
   const title =
     profile.role === "employee" ? "Ranking Empleados" : "Ranking Clientes";
+  const isPastDeadline = new Date() > DEADLINE;
+
+  const myPosition = rows.findIndex(r => r.alias === profile.alias) + 1;
+  const myRow = rows.find(r => r.alias === profile.alias);
 
   const posColors = ["text-yellow-400", "text-slate-300", "text-amber-600"];
   const posLabels = ["1°", "2°", "3°"];
@@ -63,15 +71,12 @@ export default async function RankingPage() {
               const isMe = row.alias === profile.alias;
               const isTop3 = pos <= 3;
 
-              return (
-                <div
-                  key={row.alias}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-xl border ${
-                    isMe
-                      ? "bg-[#2d1a5e] border-[#6b3db8]"
-                      : "bg-[#110828] border-[#1e0e42]"
-                  }`}
-                >
+              const href = isMe
+                ? "/mis-pronosticos"
+                : `/pronosticos/${encodeURIComponent(row.alias)}`;
+
+              const inner = (
+                <>
                   <span
                     className={`w-8 shrink-0 text-center text-base font-black ${
                       isTop3 ? posColors[pos - 1] : "text-[#4c2a8a]"
@@ -93,26 +98,58 @@ export default async function RankingPage() {
                     )}
                   </span>
 
-                  <div className="text-right shrink-0">
-                    <div className="text-white font-black text-lg leading-none">
-                      {row.total_points}
+                  <div className="flex items-center gap-2 shrink-0">
+                    <div className="text-right">
+                      <div className="text-white font-black text-lg leading-none">
+                        {row.total_points}
+                      </div>
+                      <div className="text-[#4c2a8a] text-[10px]">
+                        {row.exact_results}{" "}
+                        {row.exact_results === 1 ? "exacto" : "exactos"}
+                      </div>
                     </div>
-                    <div className="text-[#4c2a8a] text-[10px]">
-                      {row.exact_results}{" "}
-                      {row.exact_results === 1 ? "exacto" : "exactos"}
-                    </div>
+                    {(isPastDeadline || isMe) && (
+                      <span className="text-[#2d1a5e] text-xs">›</span>
+                    )}
                   </div>
+                </>
+              );
+
+              return isPastDeadline || isMe ? (
+                <Link
+                  key={row.alias}
+                  href={href}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-xl border transition-colors ${
+                    isMe
+                      ? "bg-[#2d1a5e] border-[#6b3db8] hover:bg-[#3a2270]"
+                      : "bg-[#110828] border-[#1e0e42] hover:bg-[#1a0a3e] hover:border-[#2d1a5e]"
+                  }`}
+                >
+                  {inner}
+                </Link>
+              ) : (
+                <div
+                  key={row.alias}
+                  className="flex items-center gap-3 px-4 py-3 rounded-xl border bg-[#110828] border-[#1e0e42]"
+                >
+                  {inner}
                 </div>
               );
             })}
           </div>
         )}
 
-        <p className="text-center text-[#2d1a5e] text-[10px]">
-          Desempate: exactos &gt; goles local &gt; goles visitante
+        <p className="text-center text-[#6b4fa0] text-xs">
+          Desempate: exactos › goles local › goles visitante
         </p>
+        {!isPastDeadline && (
+          <p className="text-center text-[#6b4fa0] text-xs">
+            🔒 Podés ver los pronósticos de todos a partir del 11/06
+          </p>
+        )}
       </div>
 
+      <RealtimeRefresher tables={["matches", "predictions"]} />
       <BottomNav />
     </main>
   );

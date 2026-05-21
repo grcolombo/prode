@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import FixtureClient from "./FixtureClient";
+import RealtimeRefresher from "@/components/RealtimeRefresher";
 
 export default async function FixturePage() {
   const supabase = await createClient();
@@ -22,9 +23,12 @@ export default async function FixturePage() {
   ]);
 
   return (
-    <FixtureClient
-      matches={matches ?? []}
-      predictions={predictions ?? []}
-    />
+    <>
+      <RealtimeRefresher tables={["matches", "predictions"]} />
+      <FixtureClient
+        matches={matches ?? []}
+        predictions={predictions ?? []}
+      />
+    </>
   );
 }
