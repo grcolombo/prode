@@ -110,7 +110,7 @@ export default function TermsOverlay({ isRezagado }: Props) {
           <button
             onClick={handleAccept}
             disabled={loading}
-            className="w-full bg-[#6b3db8] hover:bg-[#7d4ed4] disabled:opacity-50 text-white font-black py-3 rounded-xl transition-colors text-base"
+            className="w-full bg-[#6b3db8] hover:bg-[#7d4ed4] disabled:opacity-50 text-white font-semibold py-3 rounded-xl transition-colors text-base"
           >
             {loading ? "Cargando..." : "Aceptar y jugar →"}
           </button>
