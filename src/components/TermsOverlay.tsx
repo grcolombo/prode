@@ -77,19 +77,25 @@ export default function TermsOverlay({ isRezagado }: Props) {
         </div>
 
         {/* Redes sociales */}
-        <div className="bg-[#1a0a3e] border border-[#2d1a5e] rounded-xl px-4 py-3 flex items-center gap-3">
-          <span className="text-2xl shrink-0">📸</span>
+        <div className="bg-[#1a0a3e] border border-[#2d1a5e] rounded-xl px-4 py-3 flex flex-col gap-2">
           <p className="text-slate-200 text-sm">
-            Seguinos en Instagram — publicamos el ranking de posiciones todos los días.{" "}
-            <a
-              href="https://www.instagram.com/tarifarcomext"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[#9b6ee0] font-bold underline underline-offset-2"
-            >
-              @tarifarcomext
-            </a>
+            Publicamos el ranking de posiciones todos los días en nuestras redes.
           </p>
+          <a
+            href="https://www.instagram.com/tarifarcomext"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 self-start"
+          >
+            {/* Instagram icon */}
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="2" y="2" width="20" height="20" rx="5" stroke="#E1306C" strokeWidth="2"/>
+              <circle cx="12" cy="12" r="4" stroke="#E1306C" strokeWidth="2"/>
+              <circle cx="17.5" cy="6.5" r="1" fill="#E1306C"/>
+            </svg>
+            <span className="text-[#E1306C] font-bold text-sm">@tarifarcomext</span>
+            <span className="text-slate-400 text-sm">· Seguinos</span>
+          </a>
         </div>
 
         {/* T&C + botón */}
