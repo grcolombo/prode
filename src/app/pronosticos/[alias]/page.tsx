@@ -99,7 +99,8 @@ export default async function PronosticosAjenosPage({
     .select("id, home_team, away_team, home_flag, away_flag, scheduled_at, home_score_real, away_score_real, is_played, stage, group_name")
     .order("scheduled_at", { ascending: true });
 
-  const predMap = new Map((predictions ?? []).map((p) => [p.match_id, p]));
+  type PredRow = { match_id: number; home_score: number; away_score: number; points_earned: number | null };
+  const predMap = new Map((predictions ?? []).map((p: PredRow) => [p.match_id, p]));
 
   const allRows = (matches ?? []).map((m) => {
     const pred = predMap.get(m.id);
