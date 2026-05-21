@@ -18,7 +18,7 @@ export default function TermsOverlay({ isRezagado }: Props) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm px-4 pb-4 sm:pb-0">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm px-4 pb-20 sm:pb-0">
       <div className="w-full max-w-sm bg-[#110828] border border-[#2d1a5e] rounded-2xl flex flex-col gap-5 p-6 max-h-[90vh] overflow-y-auto">
 
         {/* Header */}
