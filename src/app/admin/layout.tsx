@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 
 const NAV = [
+  { href: "/admin/dashboard",     label: "Dashboard"     },
   { href: "/admin/resultados",    label: "Resultados"    },
   { href: "/admin/eliminatorias", label: "Eliminatorias" },
   { href: "/admin/usuarios",      label: "Usuarios"      },

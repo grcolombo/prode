@@ -16,6 +16,7 @@ type PredictionRow = {
   is_played: boolean;
   stage: string;
   group_name: string | null;
+  round: number | null;
   home_score: number | null;
   away_score: number | null;
   points_earned: number | null;
@@ -55,7 +56,7 @@ export default async function MisPronosticosPage() {
 
   const { data: matches } = await supabase
     .from("matches")
-    .select("id, home_team, away_team, home_flag, away_flag, scheduled_at, home_score_real, away_score_real, is_played, stage, group_name")
+    .select("id, home_team, away_team, home_flag, away_flag, scheduled_at, home_score_real, away_score_real, is_played, stage, group_name, round")
     .order("scheduled_at", { ascending: true });
 
   const { data: predictions } = await supabase
@@ -81,6 +82,7 @@ export default async function MisPronosticosPage() {
       is_played: m.is_played,
       stage: m.stage,
       group_name: m.group_name,
+      round: m.round ?? null,
       home_score: pred?.home_score ?? null,
       away_score: pred?.away_score ?? null,
       points_earned: pred?.points_earned ?? null,
@@ -95,6 +97,33 @@ export default async function MisPronosticosPage() {
 
   const playedRows = rows.filter((r) => r.is_played);
   const pendingRows = rows.filter((r) => !r.is_played && r.home_score !== null);
+
+  // Historial por jornada — solo jornadas con al menos 1 partido jugado
+  const stageLabel: Record<string, string> = {
+    group: "Grupos",
+    R32: "Octavos",
+    R16: "Cuartos de final",
+    QF: "Semifinales",
+    SF: "Final / 3°",
+    final: "Final",
+  };
+
+  type JornadaStat = { label: string; points: number; matches: number; maxPoints: number };
+  const jornadaMap = new Map<string, JornadaStat>();
+
+  for (const r of playedRows) {
+    const key = r.stage === "group" ? `group-${r.round ?? 1}` : r.stage;
+    const label = r.stage === "group" ? `Jornada ${r.round ?? 1}` : (stageLabel[r.stage] ?? r.stage);
+    const existing = jornadaMap.get(key);
+    if (existing) {
+      existing.points += r.points_earned ?? 0;
+      existing.matches += 1;
+      existing.maxPoints += 12;
+    } else {
+      jornadaMap.set(key, { label, points: r.points_earned ?? 0, matches: 1, maxPoints: 12 });
+    }
+  }
+  const jornadas = Array.from(jornadaMap.values());
 
   return (
     <main className="relative min-h-screen bg-[#0a0614] text-white pb-16">
@@ -123,6 +152,34 @@ export default async function MisPronosticosPage() {
             <div className="text-[#4c2a8a] text-[10px] mt-0.5">cargados</div>
           </div>
         </div>
+
+        {jornadas.length > 0 && (
+          <section className="flex flex-col gap-3">
+            <h2 className="text-xs font-bold text-[#4c2a8a] uppercase tracking-widest">
+              Por jornada
+            </h2>
+            <div className="flex flex-col gap-2">
+              {jornadas.map((j) => {
+                const pct = j.maxPoints > 0 ? Math.round((j.points / j.maxPoints) * 100) : 0;
+                const barColor = pct >= 80 ? "bg-yellow-400" : pct >= 50 ? "bg-[#9b6ee0]" : pct >= 25 ? "bg-blue-400" : "bg-[#2d1a5e]";
+                return (
+                  <div key={j.label} className="flex items-center gap-3">
+                    <span className="text-xs text-[#9b6ee0] w-20 shrink-0">{j.label}</span>
+                    <div className="flex-1 h-2 bg-[#1e0e42] rounded-full overflow-hidden">
+                      <div
+                        className={`h-full rounded-full transition-all ${barColor}`}
+                        style={{ width: `${pct}%` }}
+                      />
+                    </div>
+                    <span className="text-xs font-black text-white w-12 text-right shrink-0">
+                      {j.points} <span className="text-[#4c2a8a] font-normal">/ {j.maxPoints}</span>
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        )}
 
         {playedRows.length > 0 && (
           <section className="flex flex-col gap-2">

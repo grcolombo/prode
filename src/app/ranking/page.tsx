@@ -70,6 +70,8 @@ export default async function RankingPage() {
               const pos = i + 1;
               const isMe = row.alias === profile.alias;
               const isTop3 = pos <= 3;
+              const above = i > 0 ? rows[i - 1].total_points - row.total_points : null;
+              const below = i < rows.length - 1 ? row.total_points - rows[i + 1].total_points : null;
 
               const href = isMe
                 ? "/mis-pronosticos"
@@ -107,6 +109,22 @@ export default async function RankingPage() {
                         {row.exact_results}{" "}
                         {row.exact_results === 1 ? "exacto" : "exactos"}
                       </div>
+                      {isMe && (
+                        <div className="text-[10px] mt-0.5 space-y-0.5">
+                          {above !== null && above > 0 && (
+                            <div className="text-red-400/70">▲ {above} pts arriba</div>
+                          )}
+                          {above === 0 && (
+                            <div className="text-yellow-400/70">= Empatado</div>
+                          )}
+                          {below !== null && below > 0 && (
+                            <div className="text-green-400/70">▼ {below} pts abajo</div>
+                          )}
+                          {below === 0 && (
+                            <div className="text-yellow-400/70">= Empatado</div>
+                          )}
+                        </div>
+                      )}
                     </div>
                     {(isPastDeadline || isMe) && (
                       <span className="text-[#2d1a5e] text-xs">›</span>
