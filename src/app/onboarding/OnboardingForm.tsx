@@ -72,7 +72,12 @@ export default function OnboardingForm({ email, isClient }: Props) {
       .eq("id", user.id);
 
     if (error) {
-      setErrorMsg("Ocurrió un error. Intentá de nuevo.");
+      // Unique constraint violation — otro usuario tomó el alias en el último momento
+      if (error.code === "23505") {
+        setErrorMsg("Ese alias ya está en uso. Elegí otro.");
+      } else {
+        setErrorMsg("Ocurrió un error. Intentá de nuevo.");
+      }
       setStatus("error");
       return;
     }
