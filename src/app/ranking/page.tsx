@@ -31,9 +31,11 @@ export default async function RankingPage() {
 
   if (!profile?.alias) redirect("/onboarding");
 
+  const rezagadosEnabled = process.env.REZAGADOS_ENABLED === 'true';
+
   const [{ data: ranking }, { data: rezagadosRanking }] = await Promise.all([
     supabase.rpc("get_ranking", { p_role: profile.role }),
-    profile.role === "client"
+    (rezagadosEnabled && profile.role === "client")
       ? supabase.rpc("get_rezagados_ranking")
       : Promise.resolve({ data: null }),
   ]);
@@ -171,8 +173,8 @@ export default async function RankingPage() {
           </p>
         )}
 
-        {/* Ranking Rezagados — solo clientes */}
-        {profile.role === "client" && rezagadosRows.length > 0 && (
+        {/* Ranking Rezagados — solo clientes, solo si feature habilitada */}
+        {rezagadosEnabled && profile.role === "client" && rezagadosRows.length > 0 && (
           <section className="flex flex-col gap-3 pt-2">
             <div>
               <h2 className="text-lg font-black tracking-tight">Tabla Rezagados</h2>

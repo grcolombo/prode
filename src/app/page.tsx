@@ -1,6 +1,5 @@
 import Image from "next/image";
 import Countdown from "@/components/Countdown";
-import GoogleSignInButton from "@/components/GoogleSignInButton";
 import MagicLinkForm from "@/components/MagicLinkForm";
 
 export default function Home() {
@@ -15,7 +14,7 @@ export default function Home() {
 
       <div className="relative flex flex-col h-full max-w-sm mx-auto w-full px-6 py-4 justify-between">
 
-        {/* Header: Logo Tarifar — protagonista */}
+        {/* Header: Logo Tarifar */}
         <div className="flex justify-center">
           <Image
             src="/logo-blanco.png"
@@ -42,7 +41,7 @@ export default function Home() {
           </div>
           <div className="text-center">
             <h1 className="text-5xl font-black tracking-tight leading-none">PRODE</h1>
-            <p className="text-[#9b6ee0] text-sm font-medium tracking-[0.2em] uppercase mt-1">
+            <p className="text-slate-300 text-sm font-medium tracking-[0.2em] uppercase mt-1">
               Mundial 2026
             </p>
           </div>
@@ -51,36 +50,17 @@ export default function Home() {
         {/* Countdown */}
         <Countdown />
 
-        {/* CTA — compacto */}
-        <div className="flex flex-col gap-2.5">
-
-          {/* Google */}
-          <div className="flex flex-col gap-1">
-            <p className="text-[#9b6ee0] text-[11px] font-semibold text-center">
-              Si tenés Gmail
-            </p>
-            <GoogleSignInButton compact />
+        {/* CTA */}
+        <div className="flex flex-col gap-3">
+          <div className="text-center space-y-0.5">
+            <p className="text-white font-semibold text-sm">Ingresá con tu cuenta de Tarifar 4.0</p>
+            <p className="text-slate-400 text-xs">Te enviamos un link a tu email para acceder</p>
           </div>
-
-          {/* Divider */}
-          <div className="flex items-center gap-3">
-            <div className="flex-1 h-px bg-white/5" />
-            <span className="text-[#2d1a5e] text-xs">o</span>
-            <div className="flex-1 h-px bg-white/5" />
-          </div>
-
-          {/* Magic link */}
-          <div className="flex flex-col gap-1">
-            <p className="text-[#9b6ee0] text-[11px] font-semibold text-center">
-              Si tenés otra cuenta de mail
-            </p>
-            <MagicLinkForm compact />
-          </div>
-
+          <MagicLinkForm />
         </div>
 
         {/* Footer */}
-        <p className="text-center text-[#2d1a5e] text-[10px]">
+        <p className="text-center text-slate-600 text-[10px]">
           Tarifar · Comercio Exterior · {new Date().getFullYear()}
         </p>
 

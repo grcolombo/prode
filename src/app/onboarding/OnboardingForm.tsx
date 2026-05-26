@@ -3,8 +3,14 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { checkTarifarUser } from "./actions";
 
-export default function OnboardingForm() {
+type Props = {
+  email: string;
+  isClient: boolean;
+};
+
+export default function OnboardingForm({ email, isClient }: Props) {
   const [alias, setAlias] = useState("");
   const [status, setStatus] = useState<"idle" | "checking" | "saving" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
@@ -18,9 +24,27 @@ export default function OnboardingForm() {
 
     setStatus("checking");
     setErrorMsg("");
+
+    // Verificar contra Tarifar 4.0 solo para clientes
+    if (isClient) {
+      const { allowed, error } = await checkTarifarUser(email);
+      if (error === 'connection_error') {
+        setErrorMsg("No pudimos verificar tu cuenta. Intentá de nuevo en unos minutos.");
+        setStatus("error");
+        return;
+      }
+      if (!allowed) {
+        setErrorMsg(
+          `El email ${email} no corresponde a un usuario activo de Tarifar 4.0. Ingresá con el email que usás en la plataforma.`
+        );
+        setStatus("error");
+        return;
+      }
+    }
+
     const supabase = createClient();
 
-    // Verificar unicidad
+    // Verificar unicidad del alias
     const { data: existing } = await supabase
       .from("profiles")
       .select("id")
@@ -58,6 +82,12 @@ export default function OnboardingForm() {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      {isClient && (
+        <p className="text-center text-[#9b6ee0]/70 text-xs">
+          Verificaremos que seas usuario activo de Tarifar 4.0
+        </p>
+      )}
+
       <div className="flex flex-col gap-2">
         <input
           type="text"
