@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+﻿import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import BottomNav from "@/components/BottomNav";
@@ -66,7 +66,7 @@ export default async function RankingPage() {
   const posLabels = ["1°", "2°", "3°"];
 
   return (
-    <main className="relative min-h-screen bg-[#0a0614] text-white pb-16">
+    <main className="relative min-h-screen bg-[#442d8e] text-white pb-16">
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[400px] h-[400px] rounded-full bg-[#2d1a5e]/40 blur-[100px]" />
       </div>
@@ -75,13 +75,13 @@ export default async function RankingPage() {
 
         <div>
           <h1 className="text-2xl font-black tracking-tight">{title}</h1>
-          <p className="text-[#9b6ee0] text-xs mt-1">
+          <p className="text-[#e0d0f8] text-xs mt-1">
             Solo ves a los de tu grupo
           </p>
         </div>
 
         {rows.length === 0 ? (
-          <p className="text-[#4c2a8a] text-center py-16 text-sm">
+          <p className="text-[#c4a7f0] text-center py-16 text-sm">
             Todavia no hay participantes
           </p>
         ) : (
@@ -101,7 +101,7 @@ export default async function RankingPage() {
                 <>
                   <span
                     className={`w-8 shrink-0 text-center text-base font-black ${
-                      isTop3 ? posColors[pos - 1] : "text-[#4c2a8a]"
+                      isTop3 ? posColors[pos - 1] : "text-[#c4a7f0]"
                     }`}
                   >
                     {isTop3 ? posLabels[pos - 1] : `${pos}`}
@@ -114,7 +114,7 @@ export default async function RankingPage() {
                   >
                     {row.alias}
                     {isMe && (
-                      <span className="ml-2 text-[#9b6ee0] text-xs font-normal">
+                      <span className="ml-2 text-[#e0d0f8] text-xs font-normal">
                         (vos)
                       </span>
                     )}
@@ -125,7 +125,7 @@ export default async function RankingPage() {
                       <div className="text-white font-black text-lg leading-none">
                         {row.total_points}
                       </div>
-                      <div className="text-[#4c2a8a] text-[10px]">
+                      <div className="text-[#c4a7f0] text-[10px]">
                         {row.exact_results}{" "}
                         {row.exact_results === 1 ? "exacto" : "exactos"}
                       </div>
@@ -147,7 +147,7 @@ export default async function RankingPage() {
                       )}
                     </div>
                     {(isPastDeadline || isMe) && (
-                      <span className="text-[#2d1a5e] text-xs">›</span>
+                      <span className="text-[#e0d0f8] text-xs">›</span>
                     )}
                   </div>
                 </>
@@ -159,8 +159,8 @@ export default async function RankingPage() {
                   href={href}
                   className={`flex items-center gap-3 px-4 py-3 rounded-xl border transition-colors ${
                     isMe
-                      ? "bg-[#2d1a5e] border-[#6b3db8] hover:bg-[#3a2270]"
-                      : "bg-[#110828] border-[#1e0e42] hover:bg-[#1a0a3e] hover:border-[#2d1a5e]"
+                      ? "bg-[#2d1a5e] border-[#6b3db8] hover:bg-[#1e0e42]"
+                      : "bg-[#2d1a5e] border-white/10 hover:bg-[#1e0e42] hover:border-white/20"
                   }`}
                 >
                   {inner}
@@ -168,7 +168,7 @@ export default async function RankingPage() {
               ) : (
                 <div
                   key={row.alias}
-                  className="flex items-center gap-3 px-4 py-3 rounded-xl border bg-[#110828] border-[#1e0e42]"
+                  className="flex items-center gap-3 px-4 py-3 rounded-xl border bg-[#2d1a5e] border-white/10"
                 >
                   {inner}
                 </div>
@@ -184,13 +184,13 @@ export default async function RankingPage() {
         {/* Premios especiales */}
         {rows.length > 0 && (
           <section className="flex flex-col gap-2 pt-2">
-            <h2 className="text-sm font-black uppercase tracking-widest text-[#4c2a8a]">Premios especiales</h2>
+            <h2 className="text-sm font-black uppercase tracking-widest text-[#c4a7f0]">Premios especiales</h2>
 
             {/* Carrera de campeones */}
-            <div className="flex items-center gap-3 bg-[#110828] border border-[#1e0e42] rounded-xl px-4 py-3">
+            <div className="flex items-center gap-3 bg-[#2d1a5e] border border-white/10 rounded-xl px-4 py-3">
               <span className="text-xl">🏆</span>
               <div className="flex-1 min-w-0">
-                <p className="text-[10px] text-[#4c2a8a] uppercase tracking-wider font-bold">Carrera de campeones</p>
+                <p className="text-[10px] text-[#c4a7f0] uppercase tracking-wider font-bold">Carrera de campeones</p>
                 <p className="text-white font-bold text-sm truncate">{rankingWinner?.alias ?? "—"}</p>
               </div>
               <div className="text-right shrink-0">
@@ -199,14 +199,14 @@ export default async function RankingPage() {
             </div>
 
             {/* El Adivino */}
-            <div className="flex items-center gap-3 bg-[#110828] border border-[#1e0e42] rounded-xl px-4 py-3">
+            <div className="flex items-center gap-3 bg-[#2d1a5e] border border-white/10 rounded-xl px-4 py-3">
               <span className="text-xl">🔮</span>
               <div className="flex-1 min-w-0">
-                <p className="text-[10px] text-[#4c2a8a] uppercase tracking-wider font-bold">El Adivino</p>
+                <p className="text-[10px] text-[#c4a7f0] uppercase tracking-wider font-bold">El Adivino</p>
                 <p className="text-white font-bold text-sm truncate">{adivinoWinner?.alias ?? "—"}</p>
                 {adivinoWinner?.alias === rankingWinner?.alias ? null : (
                   sortedByExacts[0]?.alias === rankingWinner?.alias && (
-                    <p className="text-[9px] text-[#4c2a8a] mt-0.5">
+                    <p className="text-[9px] text-[#c4a7f0] mt-0.5">
                       ({sortedByExacts[0].alias} ya ganó la carrera de campeones)
                     </p>
                   )
@@ -214,7 +214,7 @@ export default async function RankingPage() {
               </div>
               <div className="text-right shrink-0">
                 <p className="text-white font-black">{adivinoWinner?.exact_results ?? 0}</p>
-                <p className="text-[#4c2a8a] text-[10px]">exactos</p>
+                <p className="text-[#c4a7f0] text-[10px]">exactos</p>
               </div>
             </div>
           </section>
@@ -230,7 +230,7 @@ export default async function RankingPage() {
           <section className="flex flex-col gap-3 pt-2">
             <div>
               <h2 className="text-lg font-black tracking-tight">Tabla Rezagados</h2>
-              <p className="text-[#9b6ee0] text-xs mt-0.5">Solo cuentan puntos de R32 en adelante</p>
+              <p className="text-[#e0d0f8] text-xs mt-0.5">Solo cuentan puntos de R32 en adelante</p>
             </div>
             <div className="flex flex-col gap-2">
               {rezagadosRows.map((row, i) => {
@@ -243,19 +243,19 @@ export default async function RankingPage() {
                   <div
                     key={row.alias}
                     className={`flex items-center gap-3 px-4 py-3 rounded-xl border ${
-                      isMe ? "bg-[#2d1a5e] border-[#6b3db8]" : "bg-[#110828] border-[#1e0e42]"
+                      isMe ? "bg-[#2d1a5e] border-[#6b3db8]" : "bg-[#2d1a5e] border-white/10"
                     }`}
                   >
-                    <span className={`w-8 shrink-0 text-center text-base font-black ${isTop3 ? posColors[pos - 1] : "text-[#4c2a8a]"}`}>
+                    <span className={`w-8 shrink-0 text-center text-base font-black ${isTop3 ? posColors[pos - 1] : "text-[#c4a7f0]"}`}>
                       {isTop3 ? posLabels[pos - 1] : `${pos}`}
                     </span>
                     <span className={`flex-1 font-semibold text-sm truncate ${isMe ? "text-white" : "text-[#d4c0f0]"}`}>
                       {row.alias}
-                      {isMe && <span className="ml-2 text-[#9b6ee0] text-xs font-normal">(vos)</span>}
+                      {isMe && <span className="ml-2 text-[#e0d0f8] text-xs font-normal">(vos)</span>}
                     </span>
                     <div className="text-right shrink-0">
                       <div className="text-white font-black text-lg leading-none">{row.total_points}</div>
-                      <div className="text-[#4c2a8a] text-[10px]">{row.exact_results} {row.exact_results === 1 ? "exacto" : "exactos"}</div>
+                      <div className="text-[#c4a7f0] text-[10px]">{row.exact_results} {row.exact_results === 1 ? "exacto" : "exactos"}</div>
                     </div>
                   </div>
                 );

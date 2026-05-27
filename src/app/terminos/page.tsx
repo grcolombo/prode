@@ -1,14 +1,14 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 
 export default function TerminosPage() {
   return (
-    <main className="min-h-screen bg-[#0a0614] text-white px-4 py-8">
+    <main className="min-h-screen bg-[#442d8e] text-white px-4 py-8">
       <div className="max-w-sm mx-auto flex flex-col gap-6">
 
         <div>
-          <Link href="/fixture" className="text-[#4c2a8a] text-xs">← Volver</Link>
+          <Link href="/fixture" className="text-[#c4a7f0] text-xs">← Volver</Link>
           <h1 className="text-2xl font-black mt-2">Términos y Condiciones</h1>
-          <p className="text-[#9b6ee0] text-xs mt-1">Prode Tarifar · Mundial 2026</p>
+          <p className="text-[#e0d0f8] text-xs mt-1">Prode Tarifar · Mundial 2026</p>
         </div>
 
         <div className="flex flex-col gap-4 text-sm text-slate-300 leading-relaxed">
@@ -51,7 +51,7 @@ export default function TerminosPage() {
             <h2 className="text-white font-bold">5. Sistema de puntos</h2>
             <p>
               Ver el detalle del sistema de puntos y criterios de desempate en la sección{" "}
-              <Link href="/reglas" className="text-[#9b6ee0] underline underline-offset-2">Reglas</Link>.
+              <Link href="/reglas" className="text-[#e0d0f8] underline underline-offset-2">Reglas</Link>.
             </p>
           </section>
 

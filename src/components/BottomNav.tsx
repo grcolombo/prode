@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -75,7 +75,7 @@ export default function BottomNav() {
   }
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-[#0d0720] border-t border-[#1e0e42]">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-[#2d1a5e] border-t border-white/10">
       <div className="max-w-sm mx-auto flex items-stretch">
         {NAV_ITEMS.map(({ href, label, icon }) => {
           const active = pathname.startsWith(href);
@@ -84,10 +84,10 @@ export default function BottomNav() {
               key={href}
               href={href}
               className={`flex-1 flex flex-col items-center gap-1 py-3 text-[10px] font-semibold transition-colors ${
-                active ? "text-white" : "text-[#4c2a8a]"
+                active ? "text-white" : "text-[#c4a7f0]"
               }`}
             >
-              <span className={active ? "text-[#9b6ee0]" : ""}>{icon}</span>
+              <span className={active ? "text-[#e0d0f8]" : ""}>{icon}</span>
               {label}
               {active && (
                 <span className="absolute bottom-0 w-12 h-0.5 bg-[#6b3db8] rounded-t-full" />
@@ -104,7 +104,7 @@ export default function BottomNav() {
             </div>
             <Link
               href="/admin"
-              className="px-3 flex flex-col items-center justify-center gap-1 text-[#6b3db8] hover:text-[#9b6ee0] transition-colors"
+              className="px-3 flex flex-col items-center justify-center gap-1 text-[#6b3db8] hover:text-[#e0d0f8] transition-colors"
               title="Panel Admin"
             >
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
@@ -123,7 +123,7 @@ export default function BottomNav() {
         </div>
         <button
           onClick={handleLogout}
-          className="px-4 flex flex-col items-center justify-center gap-1 text-[#2d1a5e] hover:text-red-400 transition-colors"
+          className="px-4 flex flex-col items-center justify-center gap-1 text-[#e0d0f8] hover:text-red-400 transition-colors"
           title="Cerrar sesión"
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">

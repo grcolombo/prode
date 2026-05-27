@@ -1,4 +1,4 @@
-import type { MetadataRoute } from "next";
+﻿import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
@@ -7,8 +7,8 @@ export default function manifest(): MetadataRoute.Manifest {
     description: "Juego de pronósticos del Mundial 2026 — Tarifar",
     start_url: "/fixture",
     display: "standalone",
-    background_color: "#0a0614",
-    theme_color: "#0a0614",
+    background_color: "#442d8e",
+    theme_color: "#442d8e",
     orientation: "portrait",
     icons: [
       {

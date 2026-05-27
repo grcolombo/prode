@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+﻿import { createClient } from "@/lib/supabase/server";
 
 type TiebreakerRow = { alias: string; pts: number; exactos: number; home_ok: number; away_ok: number };
 
@@ -23,9 +23,9 @@ type DashboardStats = {
 
 function StatCard({ label, value, sub }: { label: string; value: string | number; sub?: string }) {
   return (
-    <div className="bg-[#110828] border border-[#1e0e42] rounded-xl p-4 text-center">
+    <div className="bg-[#2d1a5e] border border-white/10 rounded-xl p-4 text-center">
       <div className="text-2xl font-black text-white">{value}</div>
-      {sub && <div className="text-[#9b6ee0] text-xs font-semibold mt-0.5">{sub}</div>}
+      {sub && <div className="text-[#e0d0f8] text-xs font-semibold mt-0.5">{sub}</div>}
       <div className="text-slate-400 text-[11px] mt-1 uppercase tracking-wider">{label}</div>
     </div>
   );
@@ -36,7 +36,7 @@ function GoldCard({ rows, title }: { rows: { alias: string; pts: number; exactos
   const leader = rows?.[0];
   const tied = rows?.filter(r => r.pts === leader?.pts) ?? [];
   const posLabels = ["🥇", "🥈", "🥉", "4°", "5°"];
-  const posColors = ["text-yellow-400", "text-slate-300", "text-amber-600", "text-[#9b6ee0]", "text-[#9b6ee0]"];
+  const posColors = ["text-yellow-400", "text-slate-300", "text-amber-600", "text-[#e0d0f8]", "text-[#e0d0f8]"];
 
   return (
     <div className="bg-[#1a1000] border border-yellow-500/30 rounded-xl p-5 flex flex-col gap-4">
@@ -216,7 +216,7 @@ export default async function AdminDashboardPage() {
         </div>
 
         {/* Desglose fixture */}
-        <div className="bg-[#110828] border border-[#1e0e42] rounded-xl p-4 flex flex-col gap-3">
+        <div className="bg-[#2d1a5e] border border-white/10 rounded-xl p-4 flex flex-col gap-3">
           <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Estado del fixture</h3>
           {fixtureRows.map((r) => {
             const pct = stats.total_users > 0 ? Math.round((r.value / stats.total_users) * 100) : 0;
@@ -273,25 +273,25 @@ export default async function AdminDashboardPage() {
       <section className="flex flex-col gap-3">
         <h2 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Datos del fixture</h2>
         <div className="grid sm:grid-cols-2 gap-3">
-          <div className="bg-[#110828] border border-[#1e0e42] rounded-xl p-4 flex flex-col gap-1">
+          <div className="bg-[#2d1a5e] border border-white/10 rounded-xl p-4 flex flex-col gap-1">
             <div className="text-xs text-slate-400">📊 Partido más pronosticado</div>
             {stats.most_predicted_match ? (
               <>
                 <div className="text-white font-bold text-sm">
                   {stats.most_predicted_match.home_team} vs {stats.most_predicted_match.away_team}
                 </div>
-                <div className="text-[#9b6ee0] text-xs">{stats.most_predicted_match.count} predicciones cargadas</div>
+                <div className="text-[#e0d0f8] text-xs">{stats.most_predicted_match.count} predicciones cargadas</div>
               </>
             ) : <div className="text-slate-400 text-xs">Sin datos aún</div>}
           </div>
-          <div className="bg-[#110828] border border-[#1e0e42] rounded-xl p-4 flex flex-col gap-1">
+          <div className="bg-[#2d1a5e] border border-white/10 rounded-xl p-4 flex flex-col gap-1">
             <div className="text-xs text-slate-400">🎯 Partido más acertado</div>
             {stats.most_exact_match ? (
               <>
                 <div className="text-white font-bold text-sm">
                   {stats.most_exact_match.home_team} {stats.most_exact_match.home_score_real}-{stats.most_exact_match.away_score_real} {stats.most_exact_match.away_team}
                 </div>
-                <div className="text-[#9b6ee0] text-xs">{stats.most_exact_match.count} pronósticos exactos</div>
+                <div className="text-[#e0d0f8] text-xs">{stats.most_exact_match.count} pronósticos exactos</div>
               </>
             ) : <div className="text-slate-400 text-xs">Sin datos aún</div>}
           </div>
@@ -303,7 +303,7 @@ export default async function AdminDashboardPage() {
         <h2 className="text-xs font-bold text-slate-400 uppercase tracking-widest">
           Ranking Empleados <span className="text-slate-500 normal-case font-normal tracking-normal">· uso interno</span>
         </h2>
-        <div className="bg-[#110828] border border-[#1e0e42] rounded-xl p-4 flex flex-col gap-1.5">
+        <div className="bg-[#2d1a5e] border border-white/10 rounded-xl p-4 flex flex-col gap-1.5">
           {(stats.top_employees ?? []).length === 0 ? (
             <p className="text-slate-400 text-xs text-center py-2">Sin datos aún</p>
           ) : (

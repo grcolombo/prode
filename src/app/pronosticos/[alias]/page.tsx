@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+﻿import { createClient } from "@/lib/supabase/server";
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import BottomNav from "@/components/BottomNav";
@@ -15,7 +15,7 @@ function PointsBadge({ points }: { points: number | null }) {
       ? "bg-green-500/20 text-green-400"
       : points > 0
       ? "bg-blue-500/20 text-blue-300"
-      : "bg-[#1e0e42] text-[#4c2a8a]";
+      : "bg-[#1e0e42] text-[#c4a7f0]";
   return (
     <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${color}`}>
       {points === 12 ? "⭐ 12" : `${points} pts`}
@@ -48,11 +48,11 @@ export default async function PronosticosAjenosPage({
   // Pre-deadline: no disponible
   if (new Date() < DEADLINE) {
     return (
-      <main className="relative min-h-screen bg-[#0a0614] text-white pb-16">
+      <main className="relative min-h-screen bg-[#442d8e] text-white pb-16">
         <div className="relative max-w-sm mx-auto px-4 py-6 flex flex-col gap-6 items-center justify-center min-h-[60vh]">
           <div className="text-5xl">🔒</div>
           <h1 className="text-xl font-black text-center">Fixture cerrado</h1>
-          <p className="text-[#9b6ee0] text-sm text-center">
+          <p className="text-[#e0d0f8] text-sm text-center">
             Los pronósticos de otros participantes se revelan cuando cierra el fixture el{" "}
             <span className="text-white font-semibold">11 de junio</span>.
           </p>
@@ -84,7 +84,7 @@ export default async function PronosticosAjenosPage({
 
   if (error) {
     return (
-      <main className="relative min-h-screen bg-[#0a0614] text-white pb-16">
+      <main className="relative min-h-screen bg-[#442d8e] text-white pb-16">
         <div className="relative max-w-sm mx-auto px-4 py-6 text-center">
           <p className="text-red-400 text-sm">Error al cargar pronósticos.</p>
         </div>
@@ -116,42 +116,42 @@ export default async function PronosticosAjenosPage({
   const filled = preds.length;
 
   return (
-    <main className="relative min-h-screen bg-[#0a0614] text-white pb-16">
+    <main className="relative min-h-screen bg-[#442d8e] text-white pb-16">
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[400px] h-[400px] rounded-full bg-[#2d1a5e]/40 blur-[100px]" />
       </div>
 
       <div className="relative max-w-sm mx-auto px-4 py-6 flex flex-col gap-6">
         <div>
-          <Link href="/ranking" className="text-[#4c2a8a] text-xs mb-2 inline-block">
+          <Link href="/ranking" className="text-[#c4a7f0] text-xs mb-2 inline-block">
             ← Ranking
           </Link>
           <h1 className="text-2xl font-black tracking-tight">{alias}</h1>
-          <p className="text-[#9b6ee0] text-xs mt-1">
+          <p className="text-[#e0d0f8] text-xs mt-1">
             {targetProfile.role === "employee" ? "Empleado" : "Cliente"}
           </p>
         </div>
 
         {/* Stats */}
         <div className="grid grid-cols-3 gap-2">
-          <div className="bg-[#110828] border border-[#1e0e42] rounded-xl p-3 text-center">
+          <div className="bg-[#2d1a5e] border border-[#1e0e42] rounded-xl p-3 text-center">
             <div className="text-2xl font-black text-white">{totalPoints}</div>
-            <div className="text-[#4c2a8a] text-[10px] mt-0.5">puntos</div>
+            <div className="text-[#c4a7f0] text-[10px] mt-0.5">puntos</div>
           </div>
-          <div className="bg-[#110828] border border-[#1e0e42] rounded-xl p-3 text-center">
+          <div className="bg-[#2d1a5e] border border-[#1e0e42] rounded-xl p-3 text-center">
             <div className="text-2xl font-black text-yellow-400">{exactos}</div>
-            <div className="text-[#4c2a8a] text-[10px] mt-0.5">exactos</div>
+            <div className="text-[#c4a7f0] text-[10px] mt-0.5">exactos</div>
           </div>
-          <div className="bg-[#110828] border border-[#1e0e42] rounded-xl p-3 text-center">
-            <div className="text-2xl font-black text-[#9b6ee0]">{filled}</div>
-            <div className="text-[#4c2a8a] text-[10px] mt-0.5">cargados</div>
+          <div className="bg-[#2d1a5e] border border-[#1e0e42] rounded-xl p-3 text-center">
+            <div className="text-2xl font-black text-[#e0d0f8]">{filled}</div>
+            <div className="text-[#c4a7f0] text-[10px] mt-0.5">cargados</div>
           </div>
         </div>
 
         {/* Partidos jugados */}
         {playedRows.length > 0 && (
           <section className="flex flex-col gap-2">
-            <h2 className="text-xs font-bold text-[#4c2a8a] uppercase tracking-widest">
+            <h2 className="text-xs font-bold text-[#c4a7f0] uppercase tracking-widest">
               Jugados ({playedRows.length})
             </h2>
             {playedRows.map((row) => {
@@ -170,7 +170,7 @@ export default async function PronosticosAjenosPage({
                   </div>
 
                   <div className="text-center shrink-0">
-                    <div className="text-[10px] text-[#4c2a8a] mb-0.5">real</div>
+                    <div className="text-[10px] text-[#c4a7f0] mb-0.5">real</div>
                     <div className="text-white font-black text-base leading-none">
                       {row.home_score_real} - {row.away_score_real}
                     </div>
@@ -179,9 +179,9 @@ export default async function PronosticosAjenosPage({
                   <div className="w-px h-8 bg-[#1e0e42] shrink-0" />
 
                   <div className="text-center shrink-0">
-                    <div className="text-[10px] text-[#4c2a8a] mb-0.5">pronóstico</div>
+                    <div className="text-[10px] text-[#c4a7f0] mb-0.5">pronóstico</div>
                     {pred ? (
-                      <div className="text-[#9b6ee0] font-black text-base leading-none">
+                      <div className="text-[#e0d0f8] font-black text-base leading-none">
                         {pred.home_score} - {pred.away_score}
                       </div>
                     ) : (
@@ -201,7 +201,7 @@ export default async function PronosticosAjenosPage({
         {/* Partidos pendientes con pronóstico */}
         {pendingRows.filter(r => r.pred).length > 0 && (
           <section className="flex flex-col gap-2">
-            <h2 className="text-xs font-bold text-[#4c2a8a] uppercase tracking-widest">
+            <h2 className="text-xs font-bold text-[#c4a7f0] uppercase tracking-widest">
               Pendientes
             </h2>
             {pendingRows.filter(r => r.pred).map((row) => (
@@ -217,8 +217,8 @@ export default async function PronosticosAjenosPage({
                   </div>
                 </div>
                 <div className="text-center shrink-0">
-                  <div className="text-[10px] text-[#4c2a8a] mb-0.5">pronóstico</div>
-                  <div className="text-[#9b6ee0] font-black text-base leading-none">
+                  <div className="text-[10px] text-[#c4a7f0] mb-0.5">pronóstico</div>
+                  <div className="text-[#e0d0f8] font-black text-base leading-none">
                     {row.pred!.home_score} - {row.pred!.away_score}
                   </div>
                 </div>

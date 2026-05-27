@@ -1,15 +1,15 @@
-import Image from "next/image";
+﻿import Image from "next/image";
 import Countdown from "@/components/Countdown";
 import MagicLinkForm from "@/components/MagicLinkForm";
 
 export default function Home() {
   return (
-    <main className="relative h-screen bg-[#0a0614] text-white flex flex-col overflow-hidden">
+    <main className="relative h-screen bg-[#442d8e] text-white flex flex-col overflow-hidden">
 
       {/* Gradientes */}
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[500px] h-[500px] rounded-full bg-[#2d1a5e]/50 blur-[100px]" />
-        <div className="absolute bottom-[-10%] right-[-5%] w-[300px] h-[300px] rounded-full bg-[#4c2a8a]/20 blur-[80px]" />
+        <div className="absolute bottom-[-10%] right-[-5%] w-[300px] h-[300px] rounded-full bg-[#c4a7f0]/20 blur-[80px]" />
       </div>
 
       <div className="relative flex flex-col h-full max-w-sm mx-auto w-full px-6 py-4 justify-between">

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import Image from "next/image";
@@ -19,7 +19,7 @@ export default function TermsOverlay({ isRezagado }: Props) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm px-4 pb-20 sm:pb-0">
-      <div className="w-full max-w-sm bg-[#110828] border border-[#2d1a5e] rounded-2xl flex flex-col gap-5 p-6 max-h-[90vh] overflow-y-auto">
+      <div className="w-full max-w-sm bg-[#2d1a5e] border border-white/20 rounded-2xl flex flex-col gap-5 p-6 max-h-[90vh] overflow-y-auto">
 
         {/* Header */}
         <div className="flex flex-col gap-2">
@@ -70,14 +70,14 @@ export default function TermsOverlay({ isRezagado }: Props) {
           </div>
           <p className="text-slate-400 text-xs mt-1">
             El resultado exacto reemplaza los demás (no se suman).{" "}
-            <Link href="/reglas" className="text-[#9b6ee0] underline underline-offset-2">
+            <Link href="/reglas" className="text-[#e0d0f8] underline underline-offset-2">
               Ver reglas completas
             </Link>
           </p>
         </div>
 
         {/* Redes sociales */}
-        <div className="bg-[#1a0a3e] border border-[#2d1a5e] rounded-xl px-4 py-3 flex flex-col gap-2">
+        <div className="bg-[#1e0e42] border border-white/20 rounded-xl px-4 py-3 flex flex-col gap-2">
           <p className="text-slate-200 text-sm">
             Publicamos el ranking de posiciones todos los días en nuestras redes.
           </p>
@@ -102,7 +102,7 @@ export default function TermsOverlay({ isRezagado }: Props) {
         <div className="flex flex-col gap-3">
           <p className="text-slate-500 text-xs text-center">
             Al continuar aceptás los{" "}
-            <Link href="/terminos" className="text-[#9b6ee0] underline underline-offset-2">
+            <Link href="/terminos" className="text-[#e0d0f8] underline underline-offset-2">
               términos y condiciones
             </Link>{" "}
             del torneo.

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -88,7 +88,7 @@ export default function OnboardingForm({ email, isClient }: Props) {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       {isClient && (
-        <p className="text-center text-[#9b6ee0]/70 text-xs">
+        <p className="text-center text-[#e0d0f8]/70 text-xs">
           Verificaremos que seas usuario activo de Tarifar 4.0
         </p>
       )}
@@ -107,10 +107,10 @@ export default function OnboardingForm({ email, isClient }: Props) {
           className="bg-white/5 border border-white/10 rounded-2xl px-4 py-3.5 text-white placeholder-white/20 focus:outline-none focus:border-[#6b3db8] focus:bg-white/8 transition-all text-center text-lg tracking-wide"
         />
         <div className="flex justify-between text-xs px-1">
-          <span className={errorMsg ? "text-red-400" : "text-[#9b6ee0]/50"}>
+          <span className={errorMsg ? "text-red-400" : "text-[#e0d0f8]/50"}>
             {errorMsg || "Mínimo 3 caracteres"}
           </span>
-          <span className="text-[#9b6ee0]/30">{alias.length}/20</span>
+          <span className="text-[#e0d0f8]/30">{alias.length}/20</span>
         </div>
       </div>
 
@@ -124,7 +124,7 @@ export default function OnboardingForm({ email, isClient }: Props) {
         {(status === "idle" || status === "error") && "Confirmar alias"}
       </button>
 
-      <p className="text-center text-[#4c2a8a] text-xs">
+      <p className="text-center text-[#c4a7f0] text-xs">
         Tu nombre real nunca será visible para otros participantes.
       </p>
     </form>

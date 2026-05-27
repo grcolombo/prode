@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 
@@ -37,7 +37,7 @@ export default function InstallPrompt() {
 
   return (
     <div className="fixed bottom-20 left-0 right-0 z-40 px-4">
-      <div className="max-w-sm mx-auto bg-[#110828] border border-[#2d1a5e] rounded-2xl px-4 py-3 flex items-center gap-3 shadow-xl">
+      <div className="max-w-sm mx-auto bg-[#2d1a5e] border border-white/20 rounded-2xl px-4 py-3 flex items-center gap-3 shadow-xl">
         <div className="w-10 h-10 rounded-xl bg-[#6b3db8] flex items-center justify-center shrink-0 text-lg">
           ⚽
         </div>

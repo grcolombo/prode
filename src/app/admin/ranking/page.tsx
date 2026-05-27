@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+﻿import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 
 type RankingRow = {
@@ -30,16 +30,16 @@ function PremioCard({
   nota?: string;
 }) {
   return (
-    <div className="flex items-center gap-3 bg-[#110828] border border-[#1e0e42] rounded-xl px-4 py-3">
+    <div className="flex items-center gap-3 bg-[#2d1a5e] border border-white/10 rounded-xl px-4 py-3">
       <span className="text-2xl shrink-0">{emoji}</span>
       <div className="flex-1 min-w-0">
-        <p className="text-[10px] text-[#4c2a8a] uppercase tracking-wider font-bold">{titulo}</p>
+        <p className="text-[10px] text-[#c4a7f0] uppercase tracking-wider font-bold">{titulo}</p>
         <p className="text-white font-bold text-sm truncate">{alias ?? "—"}</p>
-        {nota && <p className="text-[9px] text-[#4c2a8a] mt-0.5">{nota}</p>}
+        {nota && <p className="text-[9px] text-[#c4a7f0] mt-0.5">{nota}</p>}
       </div>
       <div className="text-right shrink-0">
         <p className="text-white font-black text-lg leading-none">{stat}</p>
-        <p className="text-[#4c2a8a] text-[10px]">{statLabel}</p>
+        <p className="text-[#c4a7f0] text-[10px]">{statLabel}</p>
       </div>
     </div>
   );
@@ -48,9 +48,9 @@ function PremioCard({
 function RankingTable({ rows, title }: { rows: RankingRow[]; title: string }) {
   return (
     <div className="flex flex-col gap-3">
-      <h2 className="text-sm font-black text-[#9b6ee0] uppercase tracking-wider">{title}</h2>
+      <h2 className="text-sm font-black text-[#e0d0f8] uppercase tracking-wider">{title}</h2>
       {rows.length === 0 ? (
-        <p className="text-[#2d1a5e] text-xs text-center py-6">Sin participantes</p>
+        <p className="text-[#e0d0f8] text-xs text-center py-6">Sin participantes</p>
       ) : (
         <div className="flex flex-col gap-1.5">
           {rows.map((row, i) => {
@@ -60,18 +60,18 @@ function RankingTable({ rows, title }: { rows: RankingRow[]; title: string }) {
               <Link
                 key={row.alias}
                 href={`/admin/usuarios?user_id=${row.user_id}`}
-                className="flex items-center gap-3 bg-[#110828] border border-[#1e0e42] rounded-xl px-4 py-2.5 hover:bg-[#1a0a3e] hover:border-[#2d1a5e] transition-colors"
+                className="flex items-center gap-3 bg-[#2d1a5e] border border-white/10 rounded-xl px-4 py-2.5 hover:bg-[#1e0e42] hover:border-white/20 transition-colors"
               >
-                <span className={`w-7 shrink-0 text-center text-sm font-black ${isTop3 ? posColors[pos - 1] : "text-[#4c2a8a]"}`}>
+                <span className={`w-7 shrink-0 text-center text-sm font-black ${isTop3 ? posColors[pos - 1] : "text-[#c4a7f0]"}`}>
                   {isTop3 ? posLabels[pos - 1] : `${pos}`}
                 </span>
                 <span className="flex-1 text-sm text-[#d4c0f0] font-semibold truncate">{row.alias}</span>
                 <div className="text-right shrink-0 flex items-center gap-3">
                   <div className="text-right">
                     <span className="text-white font-black">{row.total_points}</span>
-                    <span className="text-[#4c2a8a] text-[10px] ml-1.5">{row.exact_results} ex</span>
+                    <span className="text-[#c4a7f0] text-[10px] ml-1.5">{row.exact_results} ex</span>
                   </div>
-                  <span className="text-[#2d1a5e] text-xs">›</span>
+                  <span className="text-[#e0d0f8] text-xs">›</span>
                 </div>
               </Link>
             );
@@ -132,7 +132,7 @@ export default async function AdminRankingPage() {
   function PremiosSection({ premios, label }: { premios: ReturnType<typeof calcPremios>; label: string }) {
     return (
       <div className="flex flex-col gap-3">
-        <h2 className="text-sm font-black text-[#9b6ee0] uppercase tracking-wider">Premios — {label}</h2>
+        <h2 className="text-sm font-black text-[#e0d0f8] uppercase tracking-wider">Premios — {label}</h2>
         <PremioCard
           emoji="🏆"
           titulo="Carrera de campeones"

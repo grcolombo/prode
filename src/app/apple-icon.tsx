@@ -1,4 +1,4 @@
-import { ImageResponse } from "next/og";
+﻿import { ImageResponse } from "next/og";
 
 export const size = { width: 180, height: 180 };
 export const contentType = "image/png";
@@ -10,7 +10,7 @@ export default function AppleIcon() {
         style={{
           width: 180,
           height: 180,
-          background: "linear-gradient(135deg, #1a0a3e 0%, #0a0614 100%)",
+          background: "linear-gradient(135deg, #1a0a3e 0%, #442d8e 100%)",
           borderRadius: 40,
           display: "flex",
           flexDirection: "column",

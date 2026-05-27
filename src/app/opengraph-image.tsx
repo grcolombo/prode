@@ -1,4 +1,4 @@
-import { ImageResponse } from "next/og";
+﻿import { ImageResponse } from "next/og";
 import { readFileSync } from "fs";
 import { join } from "path";
 
@@ -15,7 +15,7 @@ export default function OgImage() {
         style={{
           width: 1200,
           height: 630,
-          background: "#0a0614",
+          background: "#442d8e",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",

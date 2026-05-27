@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
@@ -45,7 +45,7 @@ export default function MagicLinkForm({ compact = false }: { compact?: boolean }
       {/* Overlay: usuario validado / link enviado */}
       {status === "link_sent" && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm px-4 pb-20 sm:pb-0">
-          <div className="w-full max-w-sm bg-[#110828] border border-[#2d1a5e] rounded-2xl flex flex-col gap-5 p-6">
+          <div className="w-full max-w-sm bg-[#2d1a5e] border border-white/20 rounded-2xl flex flex-col gap-5 p-6">
             <div className="flex flex-col items-center gap-3 text-center">
               <div className="w-14 h-14 rounded-full bg-green-500/10 border border-green-500/30 flex items-center justify-center">
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -60,7 +60,7 @@ export default function MagicLinkForm({ compact = false }: { compact?: boolean }
                 <p className="text-white font-semibold text-sm">{email.trim()}</p>
               </div>
             </div>
-            <div className="bg-[#1a0a3e] border border-[#2d1a5e] rounded-xl px-4 py-3 text-center">
+            <div className="bg-[#1e0e42] border border-white/20 rounded-xl px-4 py-3 text-center">
               <p className="text-slate-400 text-xs">
                 Abrí el email y hacé clic en el link para ingresar al Prode.
                 <br />
@@ -74,7 +74,7 @@ export default function MagicLinkForm({ compact = false }: { compact?: boolean }
       {/* Overlay: email no válido */}
       {status === "invalid" && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm px-4 pb-20 sm:pb-0">
-          <div className="w-full max-w-sm bg-[#110828] border border-[#2d1a5e] rounded-2xl flex flex-col gap-5 p-6">
+          <div className="w-full max-w-sm bg-[#2d1a5e] border border-white/20 rounded-2xl flex flex-col gap-5 p-6">
             <div className="flex flex-col items-center gap-3 text-center">
               <div className="w-14 h-14 rounded-full bg-red-500/10 border border-red-500/30 flex items-center justify-center">
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#f87171" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -90,13 +90,13 @@ export default function MagicLinkForm({ compact = false }: { compact?: boolean }
                 </p>
               </div>
             </div>
-            <div className="bg-[#1a0a3e] border border-[#2d1a5e] rounded-xl px-4 py-3">
+            <div className="bg-[#1e0e42] border border-white/20 rounded-xl px-4 py-3">
               <p className="text-slate-400 text-xs text-center">
                 Revisá los datos ingresados o contactate con el equipo de ventas:
               </p>
               <a
                 href="mailto:ventas@tarifar.com?subject=No%20puedo%20inscribirme%20a%20Prode%20Tarifar"
-                className="mt-2 flex items-center justify-center gap-1.5 text-[#9b6ee0] font-semibold text-sm hover:text-[#b88ef0] transition-colors"
+                className="mt-2 flex items-center justify-center gap-1.5 text-[#e0d0f8] font-semibold text-sm hover:text-[#b88ef0] transition-colors"
               >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
@@ -107,7 +107,7 @@ export default function MagicLinkForm({ compact = false }: { compact?: boolean }
             </div>
             <button
               onClick={() => { setStatus("idle"); }}
-              className="w-full border border-[#2d1a5e] text-slate-300 font-semibold py-3 rounded-xl transition-colors hover:bg-white/5 text-sm"
+              className="w-full border border-white/20 text-slate-300 font-semibold py-3 rounded-xl transition-colors hover:bg-white/5 text-sm"
             >
               Intentar con otro email
             </button>
@@ -118,7 +118,7 @@ export default function MagicLinkForm({ compact = false }: { compact?: boolean }
       {/* Overlay: error de conexión */}
       {status === "error" && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm px-4 pb-20 sm:pb-0">
-          <div className="w-full max-w-sm bg-[#110828] border border-[#2d1a5e] rounded-2xl flex flex-col gap-4 p-6">
+          <div className="w-full max-w-sm bg-[#2d1a5e] border border-white/20 rounded-2xl flex flex-col gap-4 p-6">
             <div className="text-center">
               <h2 className="text-white font-black text-lg">Error de conexión</h2>
               <p className="text-slate-400 text-sm mt-1">
@@ -127,7 +127,7 @@ export default function MagicLinkForm({ compact = false }: { compact?: boolean }
             </div>
             <button
               onClick={() => setStatus("idle")}
-              className="w-full border border-[#2d1a5e] text-slate-300 font-semibold py-3 rounded-xl transition-colors hover:bg-white/5 text-sm"
+              className="w-full border border-white/20 text-slate-300 font-semibold py-3 rounded-xl transition-colors hover:bg-white/5 text-sm"
             >
               Reintentar
             </button>

@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+﻿import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 
@@ -29,14 +29,14 @@ export default async function AdminLayout({
   if (!profile?.is_admin) redirect("/fixture");
 
   return (
-    <div className="min-h-screen bg-[#0a0614] text-white">
+    <div className="min-h-screen bg-[#442d8e] text-white">
       {/* Top bar */}
-      <header className="sticky top-0 z-10 bg-[#0a0614]/95 backdrop-blur-sm border-b border-[#1e0e42]">
+      <header className="sticky top-0 z-10 bg-[#442d8e]/95 backdrop-blur-sm border-b border-white/10">
         <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
-          <span className="text-xs font-bold text-[#4c2a8a] uppercase tracking-widest">
+          <span className="text-xs font-bold text-[#c4a7f0] uppercase tracking-widest">
             Admin Panel
           </span>
-          <Link href="/fixture" className="text-[#4c2a8a] text-xs hover:text-[#9b6ee0] transition-colors">
+          <Link href="/fixture" className="text-[#c4a7f0] text-xs hover:text-[#e0d0f8] transition-colors">
             Volver a la app
           </Link>
         </div>

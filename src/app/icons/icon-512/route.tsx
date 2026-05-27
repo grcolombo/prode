@@ -1,4 +1,4 @@
-import { ImageResponse } from "next/og";
+﻿import { ImageResponse } from "next/og";
 
 export async function GET() {
   return new ImageResponse(
@@ -7,7 +7,7 @@ export async function GET() {
         style={{
           width: 512,
           height: 512,
-          background: "linear-gradient(135deg, #1a0a3e 0%, #0a0614 100%)",
+          background: "linear-gradient(135deg, #1a0a3e 0%, #442d8e 100%)",
           borderRadius: 100,
           display: "flex",
           flexDirection: "column",
@@ -30,7 +30,7 @@ export async function GET() {
         <div
           style={{
             fontSize: 28,
-            color: "#4c2a8a",
+            color: "#c4a7f0",
           }}
         >
           Mundial 2026

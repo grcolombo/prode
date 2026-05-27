@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -100,7 +100,7 @@ export default function MatchCard({ match, prediction, locked }: Props) {
           : "bg-white/[0.03] border-white/5"
     }`}>
       <div className="flex items-center justify-between mb-2">
-        <p className="text-[#4c2a8a] text-[10px]">{formatDate(match.scheduled_at)}</p>
+        <p className="text-[#c4a7f0] text-[10px]">{formatDate(match.scheduled_at)}</p>
         {match.is_played && (
           <span className="text-[9px] font-bold uppercase tracking-wider text-green-500/70 bg-green-500/10 px-1.5 py-0.5 rounded-full">
             FIN
@@ -182,7 +182,7 @@ export default function MatchCard({ match, prediction, locked }: Props) {
             className={`text-[11px] px-3 py-0.5 rounded-lg transition-all ${
               status === "saved" ? "text-green-400" :
               status === "error" ? "text-red-400" :
-              canSave ? "text-[#9b6ee0] hover:text-white active:scale-95" :
+              canSave ? "text-[#e0d0f8] hover:text-white active:scale-95" :
               "text-white/20 cursor-not-allowed"
             }`}
           >

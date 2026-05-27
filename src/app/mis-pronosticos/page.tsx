@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+﻿import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import BottomNav from "@/components/BottomNav";
 import Flag from "@/components/Flag";
@@ -31,7 +31,7 @@ function PointsBadge({ points }: { points: number | null }) {
       ? "bg-green-500/20 text-green-400"
       : points > 0
       ? "bg-blue-500/20 text-blue-300"
-      : "bg-[#1e0e42] text-[#4c2a8a]";
+      : "bg-[#1e0e42] text-[#c4a7f0]";
   return (
     <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${color}`}>
       {points} pts
@@ -126,7 +126,7 @@ export default async function MisPronosticosPage() {
   const jornadas = Array.from(jornadaMap.values());
 
   return (
-    <main className="relative min-h-screen bg-[#0a0614] text-white pb-16">
+    <main className="relative min-h-screen bg-[#442d8e] text-white pb-16">
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[400px] h-[400px] rounded-full bg-[#2d1a5e]/40 blur-[100px]" />
       </div>
@@ -135,27 +135,27 @@ export default async function MisPronosticosPage() {
 
         <div>
           <h1 className="text-2xl font-black tracking-tight">Mis pronósticos</h1>
-          <p className="text-[#9b6ee0] text-xs mt-1">{profile.alias}</p>
+          <p className="text-[#e0d0f8] text-xs mt-1">{profile.alias}</p>
         </div>
 
         <div className="grid grid-cols-3 gap-2">
-          <div className="bg-[#110828] border border-[#1e0e42] rounded-xl p-3 text-center">
+          <div className="bg-[#2d1a5e] border border-white/10 rounded-xl p-3 text-center">
             <div className="text-2xl font-black text-white">{totalPoints}</div>
-            <div className="text-[#4c2a8a] text-[10px] mt-0.5">puntos</div>
+            <div className="text-[#c4a7f0] text-[10px] mt-0.5">puntos</div>
           </div>
-          <div className="bg-[#110828] border border-[#1e0e42] rounded-xl p-3 text-center">
+          <div className="bg-[#2d1a5e] border border-white/10 rounded-xl p-3 text-center">
             <div className="text-2xl font-black text-yellow-400">{exactos}</div>
-            <div className="text-[#4c2a8a] text-[10px] mt-0.5">exactos</div>
+            <div className="text-[#c4a7f0] text-[10px] mt-0.5">exactos</div>
           </div>
-          <div className="bg-[#110828] border border-[#1e0e42] rounded-xl p-3 text-center">
-            <div className="text-2xl font-black text-[#9b6ee0]">{filled}<span className="text-sm text-[#4c2a8a]">/{totalMatches}</span></div>
-            <div className="text-[#4c2a8a] text-[10px] mt-0.5">cargados</div>
+          <div className="bg-[#2d1a5e] border border-white/10 rounded-xl p-3 text-center">
+            <div className="text-2xl font-black text-[#e0d0f8]">{filled}<span className="text-sm text-[#c4a7f0]">/{totalMatches}</span></div>
+            <div className="text-[#c4a7f0] text-[10px] mt-0.5">cargados</div>
           </div>
         </div>
 
         {jornadas.length > 0 && (
           <section className="flex flex-col gap-3">
-            <h2 className="text-xs font-bold text-[#4c2a8a] uppercase tracking-widest">
+            <h2 className="text-xs font-bold text-[#c4a7f0] uppercase tracking-widest">
               Por jornada
             </h2>
             <div className="flex flex-col gap-2">
@@ -164,7 +164,7 @@ export default async function MisPronosticosPage() {
                 const barColor = pct >= 80 ? "bg-yellow-400" : pct >= 50 ? "bg-[#9b6ee0]" : pct >= 25 ? "bg-blue-400" : "bg-[#2d1a5e]";
                 return (
                   <div key={j.label} className="flex items-center gap-3">
-                    <span className="text-xs text-[#9b6ee0] w-20 shrink-0">{j.label}</span>
+                    <span className="text-xs text-[#e0d0f8] w-20 shrink-0">{j.label}</span>
                     <div className="flex-1 h-2 bg-[#1e0e42] rounded-full overflow-hidden">
                       <div
                         className={`h-full rounded-full transition-all ${barColor}`}
@@ -172,7 +172,7 @@ export default async function MisPronosticosPage() {
                       />
                     </div>
                     <span className="text-xs font-black text-white w-12 text-right shrink-0">
-                      {j.points} <span className="text-[#4c2a8a] font-normal">/ {j.maxPoints}</span>
+                      {j.points} <span className="text-[#c4a7f0] font-normal">/ {j.maxPoints}</span>
                     </span>
                   </div>
                 );
@@ -183,7 +183,7 @@ export default async function MisPronosticosPage() {
 
         {playedRows.length > 0 && (
           <section className="flex flex-col gap-2">
-            <h2 className="text-xs font-bold text-[#4c2a8a] uppercase tracking-widest">
+            <h2 className="text-xs font-bold text-[#c4a7f0] uppercase tracking-widest">
               Jugados ({played})
             </h2>
             {playedRows.map((row) => (
@@ -194,7 +194,7 @@ export default async function MisPronosticosPage() {
 
         {pendingRows.length > 0 && (
           <section className="flex flex-col gap-2">
-            <h2 className="text-xs font-bold text-[#4c2a8a] uppercase tracking-widest">
+            <h2 className="text-xs font-bold text-[#c4a7f0] uppercase tracking-widest">
               Pendientes con pronóstico ({pendingRows.length})
             </h2>
             {pendingRows.map((row) => (
@@ -204,7 +204,7 @@ export default async function MisPronosticosPage() {
         )}
 
         {played === 0 && pendingRows.length === 0 && (
-          <p className="text-[#4c2a8a] text-center py-16 text-sm">
+          <p className="text-[#c4a7f0] text-center py-16 text-sm">
             Todavía no hay partidos cargados
           </p>
         )}
@@ -220,7 +220,7 @@ function MatchCard({ row }: { row: PredictionRow }) {
   const hasPred = row.home_score !== null;
 
   return (
-    <div className="bg-[#110828] border border-[#1e0e42] rounded-xl px-4 py-3 flex items-center gap-3">
+    <div className="bg-[#2d1a5e] border border-white/10 rounded-xl px-4 py-3 flex items-center gap-3">
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-1.5 text-sm font-semibold truncate">
           <Flag code={row.home_flag} />
@@ -234,7 +234,7 @@ function MatchCard({ row }: { row: PredictionRow }) {
 
       {row.is_played && (
         <div className="text-center shrink-0">
-          <div className="text-xs text-[#4c2a8a] mb-0.5">real</div>
+          <div className="text-xs text-[#c4a7f0] mb-0.5">real</div>
           <div className="text-white font-black text-base leading-none">
             {row.home_score_real} - {row.away_score_real}
           </div>
@@ -246,13 +246,13 @@ function MatchCard({ row }: { row: PredictionRow }) {
       )}
 
       <div className="text-center shrink-0">
-        <div className="text-xs text-[#4c2a8a] mb-0.5">vos</div>
+        <div className="text-xs text-[#c4a7f0] mb-0.5">vos</div>
         {hasPred ? (
-          <div className="text-[#9b6ee0] font-black text-base leading-none">
+          <div className="text-[#e0d0f8] font-black text-base leading-none">
             {row.home_score} - {row.away_score}
           </div>
         ) : (
-          <div className="text-[#2d1a5e] text-xs">—</div>
+          <div className="text-[#e0d0f8] text-xs">—</div>
         )}
       </div>
 

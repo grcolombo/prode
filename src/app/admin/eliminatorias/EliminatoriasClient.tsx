@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { assignTeams } from "../actions";
@@ -55,13 +55,13 @@ function MatchRow({ match }: { match: Match }) {
   const assigned = match.home_team && match.away_team;
 
   return (
-    <div className={`bg-[#110828] border rounded-xl px-4 py-3 flex flex-col gap-3 ${assigned ? "border-[#2d1a5e]" : "border-[#4c2a8a]/50"}`}>
+    <div className={`bg-[#2d1a5e] border rounded-xl px-4 py-3 flex flex-col gap-3 ${assigned ? "border-white/20" : "border-[#c4a7f0]/50"}`}>
       <div className="flex items-center justify-between">
         <div>
-          <span className="text-xs text-[#9b6ee0] font-semibold">
+          <span className="text-xs text-[#e0d0f8] font-semibold">
             {match.slot_label ?? `Partido ${match.id}`}
           </span>
-          <span className="text-[#4c2a8a] text-xs ml-2">{formatDate(match.scheduled_at)}</span>
+          <span className="text-[#c4a7f0] text-xs ml-2">{formatDate(match.scheduled_at)}</span>
         </div>
         {assigned
           ? <span className="text-[10px] text-green-400 font-bold">Asignado</span>
@@ -71,37 +71,37 @@ function MatchRow({ match }: { match: Match }) {
 
       <div className="grid grid-cols-2 gap-3">
         <div className="flex flex-col gap-1.5">
-          <label className="text-[10px] text-[#4c2a8a] font-bold uppercase">Local</label>
+          <label className="text-[10px] text-[#c4a7f0] font-bold uppercase">Local</label>
           <input
             value={homeTeam}
             onChange={e => setHomeTeam(e.target.value)}
             placeholder="Ej: Argentina"
             disabled={loading}
-            className="bg-[#0a0614] border border-[#2d1a5e] rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#6b3db8] disabled:opacity-50"
+            className="bg-[#442d8e] border border-white/20 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#6b3db8] disabled:opacity-50"
           />
           <input
             value={homeFlag}
             onChange={e => setHomeFlag(e.target.value)}
             placeholder="Bandera (emoji)"
             disabled={loading}
-            className="bg-[#0a0614] border border-[#2d1a5e] rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#6b3db8] disabled:opacity-50"
+            className="bg-[#442d8e] border border-white/20 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#6b3db8] disabled:opacity-50"
           />
         </div>
         <div className="flex flex-col gap-1.5">
-          <label className="text-[10px] text-[#4c2a8a] font-bold uppercase">Visitante</label>
+          <label className="text-[10px] text-[#c4a7f0] font-bold uppercase">Visitante</label>
           <input
             value={awayTeam}
             onChange={e => setAwayTeam(e.target.value)}
             placeholder="Ej: Brasil"
             disabled={loading}
-            className="bg-[#0a0614] border border-[#2d1a5e] rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#6b3db8] disabled:opacity-50"
+            className="bg-[#442d8e] border border-white/20 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#6b3db8] disabled:opacity-50"
           />
           <input
             value={awayFlag}
             onChange={e => setAwayFlag(e.target.value)}
             placeholder="Bandera (emoji)"
             disabled={loading}
-            className="bg-[#0a0614] border border-[#2d1a5e] rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#6b3db8] disabled:opacity-50"
+            className="bg-[#442d8e] border border-white/20 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#6b3db8] disabled:opacity-50"
           />
         </div>
       </div>
@@ -132,7 +132,7 @@ export default function EliminatoriasClient({ matches }: { matches: Match[] }) {
     return (
       <div className="flex flex-col gap-4">
         <h1 className="text-xl font-black">Eliminatorias</h1>
-        <p className="text-[#4c2a8a] text-center py-12 text-sm">
+        <p className="text-[#c4a7f0] text-center py-12 text-sm">
           No hay partidos eliminatorios cargados todavía
         </p>
       </div>
@@ -144,7 +144,7 @@ export default function EliminatoriasClient({ matches }: { matches: Match[] }) {
       <h1 className="text-xl font-black">Eliminatorias</h1>
       {Object.entries(byStage).map(([stage, ms]) => (
         <section key={stage} className="flex flex-col gap-2">
-          <h2 className="text-xs font-bold text-[#4c2a8a] uppercase tracking-widest">
+          <h2 className="text-xs font-bold text-[#c4a7f0] uppercase tracking-widest">
             {STAGE_LABEL[stage]}
           </h2>
           {ms.map(m => <MatchRow key={m.id} match={m} />)}
