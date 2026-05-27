@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { savePrediction } from "./actions";
 
 const SUBDIVISION_FLAGS: Record<string, string> = {
@@ -68,6 +69,7 @@ function formatDate(iso: string) {
 }
 
 export default function MatchCard({ match, prediction, locked }: Props) {
+  const router = useRouter();
   const [home, setHome] = useState(prediction?.home_score?.toString() ?? "");
   const [away, setAway] = useState(prediction?.away_score?.toString() ?? "");
   const [status, setStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
@@ -83,6 +85,7 @@ export default function MatchCard({ match, prediction, locked }: Props) {
 
     if (result.error) { setStatus("error"); return; }
     setStatus("saved");
+    router.refresh(); // refresca predMap del servidor para que al cambiar de grupo se vean los datos guardados
     setTimeout(() => setStatus("idle"), 2500);
   }
 
