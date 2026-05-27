@@ -34,9 +34,10 @@ type Props = {
   matches: Match[];
   predictions: Prediction[];
   stageDeadlines: Record<string, boolean>;
+  alias: string;
 };
 
-export default function FixtureClient({ matches, predictions, stageDeadlines }: Props) {
+export default function FixtureClient({ matches, predictions, stageDeadlines, alias }: Props) {
   const [activeGroup, setActiveGroup] = useState("A");
   const isPastDeadline = stageDeadlines["group"] ?? (new Date() > DEADLINE);
 
@@ -61,9 +62,16 @@ export default function FixtureClient({ matches, predictions, stageDeadlines }: 
         <div className="max-w-sm mx-auto px-4 pt-4 pb-2">
           <div className="flex items-center justify-between mb-3">
             <h1 className="text-lg font-black tracking-tight">Fixture</h1>
-            <span className={`text-[11px] font-medium ${isPastDeadline ? "text-red-400/70" : "text-[#9b6ee0]"}`}>
-              {isPastDeadline ? "🔒 Cerrado" : "● Abierto hasta el 11/06"}
-            </span>
+            <div className="flex items-center gap-2">
+              {alias && (
+                <span className="text-[11px] font-bold text-[#9b6ee0] bg-[#6b3db8]/15 px-2 py-0.5 rounded-full">
+                  @{alias}
+                </span>
+              )}
+              <span className={`text-[11px] font-medium ${isPastDeadline ? "text-red-400/70" : "text-white/30"}`}>
+                {isPastDeadline ? "🔒 Cerrado" : "● Abierto"}
+              </span>
+            </div>
           </div>
 
           {/* Group tabs */}

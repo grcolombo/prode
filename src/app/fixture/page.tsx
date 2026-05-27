@@ -47,6 +47,7 @@ export default async function FixturePage() {
         matches={matches ?? []}
         predictions={predictions ?? []}
         stageDeadlines={stageDeadlines}
+        alias={profile?.alias ?? ""}
       />
     </>
   );
