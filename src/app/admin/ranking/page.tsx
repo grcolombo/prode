@@ -148,14 +148,14 @@ export default async function AdminRankingPage() {
           statLabel="exactos"
         />
         <PremioCard
-          emoji="🔩"
+          emoji="🧱"
           titulo="El Bilardista"
           alias={premios.bilardista?.alias ?? null}
           stat={premios.bilardista?.correct_winner ?? 0}
           statLabel="gan/emp"
         />
         <PremioCard
-          emoji="🌸"
+          emoji="⚽"
           titulo="El Menotista"
           alias={premios.menotista?.alias ?? null}
           stat={(premios.menotista?.home_goals ?? 0) + (premios.menotista?.away_goals ?? 0)}
