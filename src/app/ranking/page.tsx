@@ -11,6 +11,7 @@ type RankingRow = {
   alias: string;
   total_points: number;
   exact_results: number;
+  correct_winner: number;
   home_goals: number;
   away_goals: number;
 };
@@ -48,6 +49,18 @@ export default async function RankingPage() {
 
   const myPosition = rows.findIndex(r => r.alias === profile.alias) + 1;
   const myRow = rows.find(r => r.alias === profile.alias);
+
+  // Premio "El Adivino": más exactos, pero si coincide con el 1° del ranking → va al 2°
+  const rankingWinner = rows[0] ?? null;
+  const sortedByExacts = [...rows].sort((a, b) =>
+    b.exact_results - a.exact_results || b.total_points - a.total_points
+  );
+  const adivinoWinner =
+    sortedByExacts.length > 0
+      ? sortedByExacts[0].alias === rankingWinner?.alias && sortedByExacts.length > 1
+        ? sortedByExacts[1]
+        : sortedByExacts[0]
+      : null;
 
   const posColors = ["text-yellow-400", "text-slate-300", "text-amber-600"];
   const posLabels = ["1°", "2°", "3°"];
@@ -167,6 +180,45 @@ export default async function RankingPage() {
         <p className="text-center text-[#6b4fa0] text-xs">
           Desempate: exactos › goles local › goles visitante
         </p>
+
+        {/* Premios especiales */}
+        {rows.length > 0 && (
+          <section className="flex flex-col gap-2 pt-2">
+            <h2 className="text-sm font-black uppercase tracking-widest text-[#4c2a8a]">Premios especiales</h2>
+
+            {/* Carrera de campeones */}
+            <div className="flex items-center gap-3 bg-[#110828] border border-[#1e0e42] rounded-xl px-4 py-3">
+              <span className="text-xl">🏆</span>
+              <div className="flex-1 min-w-0">
+                <p className="text-[10px] text-[#4c2a8a] uppercase tracking-wider font-bold">Carrera de campeones</p>
+                <p className="text-white font-bold text-sm truncate">{rankingWinner?.alias ?? "—"}</p>
+              </div>
+              <div className="text-right shrink-0">
+                <p className="text-white font-black">{rankingWinner?.total_points ?? 0} pts</p>
+              </div>
+            </div>
+
+            {/* El Adivino */}
+            <div className="flex items-center gap-3 bg-[#110828] border border-[#1e0e42] rounded-xl px-4 py-3">
+              <span className="text-xl">🔮</span>
+              <div className="flex-1 min-w-0">
+                <p className="text-[10px] text-[#4c2a8a] uppercase tracking-wider font-bold">El Adivino</p>
+                <p className="text-white font-bold text-sm truncate">{adivinoWinner?.alias ?? "—"}</p>
+                {adivinoWinner?.alias === rankingWinner?.alias ? null : (
+                  sortedByExacts[0]?.alias === rankingWinner?.alias && (
+                    <p className="text-[9px] text-[#4c2a8a] mt-0.5">
+                      ({sortedByExacts[0].alias} ya ganó la carrera de campeones)
+                    </p>
+                  )
+                )}
+              </div>
+              <div className="text-right shrink-0">
+                <p className="text-white font-black">{adivinoWinner?.exact_results ?? 0}</p>
+                <p className="text-[#4c2a8a] text-[10px]">exactos</p>
+              </div>
+            </div>
+          </section>
+        )}
         {!isPastDeadline && (
           <p className="text-center text-[#6b4fa0] text-xs">
             🔒 Podés ver los pronósticos de todos a partir del 11/06
