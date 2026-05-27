@@ -1,8 +1,15 @@
-﻿import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/server";
 
-type TiebreakerRow = { alias: string; pts: number; exactos: number; home_ok: number; away_ok: number };
+type RankingRow = {
+  alias: string;
+  total_points: number;
+  exact_results: number;
+  correct_winner: number;
+  home_goals: number;
+  away_goals: number;
+};
 
-type DashboardStats = {
+type GeneralStats = {
   total_users: number;
   total_predictions: number;
   matches_played: number;
@@ -11,15 +18,38 @@ type DashboardStats = {
   users_with_all: number;
   users_partial: number;
   users_empty: number;
-  top_employees: { alias: string; pts: number; exactos: number }[];
-  top_clients: { alias: string; pts: number; exactos: number }[];
-  menotista: { alias: string; avg_goals: number } | null;
-  bilardista: { alias: string; avg_goals: number } | null;
-  adivino: { alias: string; exactos: number } | null;
-  tiebreaker_table: TiebreakerRow[] | null;
   most_predicted_match: { home_team: string; away_team: string; count: number } | null;
   most_exact_match: { home_team: string; away_team: string; home_score_real: number; away_score_real: number; count: number } | null;
 };
+
+// ── Lógica de premios en cascada (igual que /admin/ranking) ──────────────────
+function calcPremios(rows: RankingRow[]) {
+  if (rows.length === 0) return { campeon: null, adivino: null, bilardista: null, menotista: null };
+
+  // 1. Campeón — 1° del ranking (ya viene ordenado por total_points)
+  const campeon = rows[0];
+  const restaCampeon = rows.slice(1);
+
+  // 2. Adivino — más exactos entre los que no son campeón
+  const sortedExactos = [...restaCampeon].sort((a, b) => b.exact_results - a.exact_results);
+  const adivino = sortedExactos[0] ?? null;
+  const restaAdivino = restaCampeon.filter(r => r.alias !== adivino?.alias);
+
+  // 3. Bilardista — más aciertos de ganador/empate entre los restantes
+  const sortedWinner = [...restaAdivino].sort((a, b) => b.correct_winner - a.correct_winner);
+  const bilardista = sortedWinner[0] ?? null;
+  const restaBilardista = restaAdivino.filter(r => r.alias !== bilardista?.alias);
+
+  // 4. Menotista — más aciertos de goles (local + visita) entre los restantes
+  const sortedGoles = [...restaBilardista].sort(
+    (a, b) => (b.home_goals + b.away_goals) - (a.home_goals + a.away_goals)
+  );
+  const menotista = sortedGoles[0] ?? null;
+
+  return { campeon, adivino, bilardista, menotista };
+}
+
+// ── Componentes ──────────────────────────────────────────────────────────────
 
 function StatCard({ label, value, sub }: { label: string; value: string | number; sub?: string }) {
   return (
@@ -31,164 +61,110 @@ function StatCard({ label, value, sub }: { label: string; value: string | number
   );
 }
 
-// 🥇 Card principal — líder de la Carrera de Campeones
-function GoldCard({ rows, title }: { rows: { alias: string; pts: number; exactos: number }[]; title: string }) {
-  const leader = rows?.[0];
-  const tied = rows?.filter(r => r.pts === leader?.pts) ?? [];
-  const posLabels = ["🥇", "🥈", "🥉", "4°", "5°"];
-  const posColors = ["text-yellow-400", "text-slate-300", "text-amber-600", "text-[#e0d0f8]", "text-[#e0d0f8]"];
-
-  return (
-    <div className="bg-[#1a1000] border border-yellow-500/30 rounded-xl p-5 flex flex-col gap-4">
-      <div className="flex items-center gap-2">
-        <span className="text-2xl">🥇</span>
-        <div>
-          <h3 className="text-base font-black text-yellow-400 uppercase tracking-wide">Carrera de Campeones</h3>
-          <p className="text-slate-400 text-[10px]">{title}</p>
-        </div>
-      </div>
-
-      {!leader ? (
-        <p className="text-slate-400 text-xs text-center py-2">Sin datos aún</p>
-      ) : (
-        <>
-          {/* Líder destacado */}
-          <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg px-4 py-3 flex items-center gap-3">
-            <span className="text-2xl">🥇</span>
-            <div className="flex-1">
-              <div className="text-yellow-400 font-black text-lg leading-none">{leader.alias}</div>
-              {tied.length > 1 && (
-                <div className="text-yellow-400/60 text-[10px] mt-0.5">
-                  Empate con {tied.slice(1).map(r => r.alias).join(", ")} · desempate por exactos
-                </div>
-              )}
-            </div>
-            <div className="text-right">
-              <div className="text-yellow-400 font-black text-2xl leading-none">{leader.pts}</div>
-              <div className="text-slate-400 text-[10px]">puntos</div>
-            </div>
-          </div>
-
-          {/* Resto del top 5 */}
-          <div className="flex flex-col gap-1.5">
-            {rows.slice(1).map((r, i) => (
-              <div key={r.alias} className="flex items-center gap-2">
-                <span className={`w-6 text-center text-sm font-black ${posColors[i + 1]}`}>{posLabels[i + 1]}</span>
-                <span className="flex-1 text-sm text-[#d4c0f0] font-semibold truncate">{r.alias}</span>
-                <span className="text-white font-black text-sm">{r.pts}</span>
-                <span className="text-slate-400 text-[10px] w-12 text-right">{r.exactos} ex</span>
-              </div>
-            ))}
-          </div>
-        </>
-      )}
-    </div>
-  );
-}
-
-// Regla general de desempate (banner)
-function TiebreakerRules() {
-  return (
-    <div className="bg-slate-400/5 border border-slate-400/15 rounded-xl px-4 py-3 flex flex-wrap gap-2 items-center">
-      <span className="text-slate-400 text-[11px] mr-1">Desempate:</span>
-      {["1° Exactos (12pts)", "2° Goles local acertados", "3° Goles visitante acertados"].map((r) => (
-        <span key={r} className="text-[11px] bg-slate-400/10 text-slate-300 px-2 py-0.5 rounded-full">{r}</span>
-      ))}
-    </div>
-  );
-}
-
-// 🥈 Card — El Adivino
-function SilverCard({ adivino, rows }: { adivino: { alias: string; exactos: number } | null; rows: TiebreakerRow[] | null }) {
-  return (
-    <div className="bg-[#0f0f18] border border-slate-400/30 rounded-xl p-4 flex flex-col gap-3">
-      <div className="flex items-center gap-2">
-        <span className="text-xl">🥈</span>
-        <div>
-          <h3 className="text-sm font-black text-slate-300">El Adivino</h3>
-          <p className="text-slate-400 text-[11px]">Más resultados exactos · criterio de desempate</p>
-        </div>
-      </div>
-
-      {adivino ? (
-        <div className="flex items-center justify-between bg-slate-400/5 border border-slate-400/10 rounded-lg px-3 py-2">
-          <span className="text-slate-200 font-bold">{adivino.alias}</span>
-          <div>
-            <span className="text-slate-300 font-black text-lg">{adivino.exactos}</span>
-            <span className="text-slate-400 text-[11px] ml-1">exactos</span>
-          </div>
-        </div>
-      ) : (
-        <p className="text-slate-500 text-xs text-center py-1">Sin datos aún</p>
-      )}
-
-      {/* Tabla de desempate */}
-      {rows && rows.length > 0 && (
-        <div className="overflow-x-auto mt-1">
-          <table className="w-full text-xs border-collapse">
-            <thead>
-              <tr className="text-slate-400 text-[10px] uppercase tracking-wider">
-                <th className="text-left py-1.5 font-semibold">#</th>
-                <th className="text-left py-1.5 font-semibold">Alias</th>
-                <th className="text-center py-1.5 font-semibold">Pts</th>
-                <th className="text-center py-1.5 font-semibold">Exactos</th>
-                <th className="text-center py-1.5 font-semibold">G.Loc</th>
-                <th className="text-center py-1.5 font-semibold">G.Vis</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((r, i) => (
-                <tr key={r.alias} className="border-t border-slate-400/10">
-                  <td className="py-1.5 text-slate-400">{i + 1}</td>
-                  <td className="py-1.5 text-slate-200 font-semibold">{r.alias}</td>
-                  <td className="text-center py-1.5 text-white font-black">{r.pts}</td>
-                  <td className="text-center py-1.5 text-yellow-400 font-bold">{r.exactos}</td>
-                  <td className="text-center py-1.5 text-slate-300">{r.home_ok}</td>
-                  <td className="text-center py-1.5 text-slate-300">{r.away_ok}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </div>
-  );
-}
-
-// 🥉 Cards — Menotista / Bilardista
-function BronzeCard({ emoji, title, description, alias, stat, statLabel }: {
-  emoji: string; title: string; description: string;
-  alias: string | null; stat: number | null; statLabel: string;
+function PremioCard({
+  emoji,
+  titulo,
+  alias,
+  stat,
+  statLabel,
+  nota,
+}: {
+  emoji: string;
+  titulo: string;
+  alias: string | null;
+  stat: number;
+  statLabel: string;
+  nota?: string;
 }) {
   return (
-    <div className="bg-[#120a00] border border-amber-700/30 rounded-xl p-4 flex flex-col gap-2">
-      <div className="flex items-center gap-2">
-        <span className="text-xl">🥉</span>
-        <span className="text-lg">{emoji}</span>
-        <div>
-          <h3 className="text-sm font-black text-amber-600">{title}</h3>
-          <p className="text-slate-400 text-[10px]">{description}</p>
-        </div>
+    <div className="flex items-center gap-3 bg-[#2d1a5e] border border-white/10 rounded-xl px-4 py-3">
+      <span className="text-2xl shrink-0">{emoji}</span>
+      <div className="flex-1 min-w-0">
+        <p className="text-[10px] text-[#c4a7f0] uppercase tracking-wider font-bold">{titulo}</p>
+        <p className="text-white font-bold text-sm truncate">{alias ?? "—"}</p>
+        {nota && <p className="text-[9px] text-[#c4a7f0] mt-0.5">{nota}</p>}
       </div>
-      {alias ? (
-        <div className="flex items-center justify-between bg-amber-600/5 border border-amber-600/10 rounded-lg px-3 py-2">
-          <span className="text-amber-200/80 font-bold text-sm">{alias}</span>
-          <div>
-            <span className="text-amber-500 font-black">{stat}</span>
-            <span className="text-slate-400 text-[10px] ml-1">{statLabel}</span>
-          </div>
-        </div>
+      <div className="text-right shrink-0">
+        <p className="text-white font-black text-lg leading-none">{stat}</p>
+        <p className="text-[#c4a7f0] text-[10px]">{statLabel}</p>
+      </div>
+    </div>
+  );
+}
+
+function PremiosSection({ rows, label }: { rows: RankingRow[]; label: string }) {
+  const premios = calcPremios(rows);
+  return (
+    <div className="flex flex-col gap-2">
+      <h3 className="text-xs font-bold text-[#c4a7f0] uppercase tracking-widest">{label}</h3>
+      <PremioCard
+        emoji="🏆"
+        titulo="Carrera de campeones"
+        alias={premios.campeon?.alias ?? null}
+        stat={premios.campeon?.total_points ?? 0}
+        statLabel="puntos"
+      />
+      <PremioCard
+        emoji="🔮"
+        titulo="El Adivino"
+        alias={premios.adivino?.alias ?? null}
+        stat={premios.adivino?.exact_results ?? 0}
+        statLabel="exactos"
+      />
+      <PremioCard
+        emoji="🧱"
+        titulo="El Bilardista"
+        alias={premios.bilardista?.alias ?? null}
+        stat={premios.bilardista?.correct_winner ?? 0}
+        statLabel="gan/emp"
+      />
+      <PremioCard
+        emoji="⚽"
+        titulo="El Menotista"
+        alias={premios.menotista?.alias ?? null}
+        stat={(premios.menotista?.home_goals ?? 0) + (premios.menotista?.away_goals ?? 0)}
+        statLabel="goles exactos"
+      />
+    </div>
+  );
+}
+
+function RankingMiniTable({ rows, title }: { rows: RankingRow[]; title: string }) {
+  const posLabels = ["🥇", "🥈", "🥉", "4°", "5°"];
+  const posColors = ["text-yellow-400", "text-slate-300", "text-amber-600", "text-[#e0d0f8]", "text-[#e0d0f8]"];
+  return (
+    <div className="bg-[#2d1a5e] border border-white/10 rounded-xl p-4 flex flex-col gap-2">
+      <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">{title}</h3>
+      {rows.length === 0 ? (
+        <p className="text-slate-400 text-xs text-center py-2">Sin datos aún</p>
       ) : (
-        <p className="text-slate-400 text-xs text-center py-1">Sin datos aún</p>
+        rows.slice(0, 5).map((r, i) => (
+          <div key={r.alias} className="flex items-center gap-2">
+            <span className={`text-sm w-6 text-center font-black ${posColors[i]}`}>{posLabels[i]}</span>
+            <span className="flex-1 text-sm text-[#d4c0f0] font-semibold truncate">{r.alias}</span>
+            <span className="text-white font-black text-sm">{r.total_points}</span>
+            <span className="text-slate-400 text-[10px] w-12 text-right">{r.exact_results} ex</span>
+          </div>
+        ))
       )}
     </div>
   );
 }
+
+// ── Page ─────────────────────────────────────────────────────────────────────
 
 export default async function AdminDashboardPage() {
   const supabase = await createClient();
-  const { data: raw } = await supabase.rpc("get_dashboard_stats");
-  const stats = raw as DashboardStats | null;
+
+  const [{ data: raw }, { data: empRanking }, { data: cliRanking }] = await Promise.all([
+    supabase.rpc("get_dashboard_stats"),
+    supabase.rpc("get_ranking", { p_role: "employee" }),
+    supabase.rpc("get_ranking", { p_role: "client" }),
+  ]);
+
+  const stats = raw as GeneralStats | null;
+  const employees = (empRanking ?? []) as RankingRow[];
+  const clients = (cliRanking ?? []) as RankingRow[];
 
   if (!stats) {
     return <p className="text-slate-400 text-sm text-center py-16">No se pudieron cargar las estadísticas.</p>;
@@ -211,8 +187,11 @@ export default async function AdminDashboardPage() {
           <StatCard label="Participantes" value={stats.total_users} />
           <StatCard label="Partidos jugados" value={`${stats.matches_played} / ${stats.total_matches}`} />
           <StatCard label="Puntos repartidos" value={stats.points_distributed} />
-          <StatCard label="Fixture completo" value={stats.users_with_all}
-            sub={`${stats.total_users > 0 ? Math.round(stats.users_with_all / stats.total_users * 100) : 0}% del total`} />
+          <StatCard
+            label="Fixture completo"
+            value={stats.users_with_all}
+            sub={`${stats.total_users > 0 ? Math.round(stats.users_with_all / stats.total_users * 100) : 0}% del total`}
+          />
         </div>
 
         {/* Desglose fixture */}
@@ -234,38 +213,21 @@ export default async function AdminDashboardPage() {
         </div>
       </section>
 
-      {/* 🥇 Carrera de Campeones — solo clientes */}
-      <section className="flex flex-col gap-3">
-        <h2 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Podio</h2>
-        <GoldCard rows={stats.top_clients ?? []} title="Clientes · puntos totales" />
+      {/* Premios especiales — cascada por rol */}
+      <section className="flex flex-col gap-4">
+        <h2 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Premios especiales</h2>
+        <div className="grid md:grid-cols-2 gap-6">
+          <PremiosSection rows={employees} label="Empleados" />
+          <PremiosSection rows={clients} label="Clientes" />
+        </div>
       </section>
 
-      {/* Regla general de desempate */}
-      <TiebreakerRules />
-
-      {/* 🥈 El Adivino + tabla de desempate */}
-      <section>
-        <SilverCard adivino={stats.adivino ?? null} rows={stats.tiebreaker_table ?? null} />
-      </section>
-
-      {/* 🥉 Menotista + Bilardista */}
+      {/* Top 5 rankings */}
       <section className="flex flex-col gap-3">
-        <h2 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Estilos de juego</h2>
+        <h2 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Rankings</h2>
         <div className="grid sm:grid-cols-2 gap-3">
-          <BronzeCard
-            emoji="⚽" title="El Menotista"
-            description="Pronostica más goles por partido · fútbol de ataque"
-            alias={stats.menotista?.alias ?? null}
-            stat={stats.menotista?.avg_goals ?? null}
-            statLabel="goles/partido en promedio"
-          />
-          <BronzeCard
-            emoji="🧱" title="El Bilardista"
-            description="Pronostica menos goles por partido · resultadista puro"
-            alias={stats.bilardista?.alias ?? null}
-            stat={stats.bilardista?.avg_goals ?? null}
-            statLabel="goles/partido en promedio"
-          />
+          <RankingMiniTable rows={employees} title="Empleados" />
+          <RankingMiniTable rows={clients} title="Clientes" />
         </div>
       </section>
 
@@ -295,27 +257,6 @@ export default async function AdminDashboardPage() {
               </>
             ) : <div className="text-slate-400 text-xs">Sin datos aún</div>}
           </div>
-        </div>
-      </section>
-
-      {/* Ranking empleados (solo admin, no se comparte) */}
-      <section className="flex flex-col gap-3">
-        <h2 className="text-xs font-bold text-slate-400 uppercase tracking-widest">
-          Ranking Empleados <span className="text-slate-500 normal-case font-normal tracking-normal">· uso interno</span>
-        </h2>
-        <div className="bg-[#2d1a5e] border border-white/10 rounded-xl p-4 flex flex-col gap-1.5">
-          {(stats.top_employees ?? []).length === 0 ? (
-            <p className="text-slate-400 text-xs text-center py-2">Sin datos aún</p>
-          ) : (
-            stats.top_employees.map((r, i) => (
-              <div key={r.alias} className="flex items-center gap-2">
-                <span className="text-sm w-6 text-center">{["🥇","🥈","🥉","4°","5°"][i]}</span>
-                <span className="flex-1 text-sm text-[#d4c0f0] font-semibold truncate">{r.alias}</span>
-                <span className="text-white font-black text-sm">{r.pts}</span>
-                <span className="text-slate-400 text-[10px] w-12 text-right">{r.exactos} ex</span>
-              </div>
-            ))
-          )}
         </div>
       </section>
     </div>
