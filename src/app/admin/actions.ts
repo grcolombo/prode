@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { revalidatePath } from "next/cache";
 
 async function assertAdmin() {
@@ -118,9 +119,10 @@ export async function deleteEmployeeEmail(email: string) {
 // ─── Usuarios ─────────────────────────────────────────────────
 
 export async function changeUserRole(userId: string, newRole: "employee" | "client") {
-  const supabase = await assertAdmin();
+  await assertAdmin(); // verifica que quien llama es admin
+  const adminSupabase = createAdminClient(); // bypasea RLS para editar perfiles ajenos
 
-  const { error } = await supabase
+  const { error } = await adminSupabase
     .from("profiles")
     .update({ role: newRole })
     .eq("id", userId);
