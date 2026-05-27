@@ -1,9 +1,11 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import Flag from "@/components/Flag";
+import { changeUserRole } from "../actions";
 
-type User = { id: string; alias: string; role: string };
+type User = { id: string; alias: string; role: string; email: string };
 type Match = {
   id: number; stage: string; group_name: string | null;
   home_team: string | null; away_team: string | null;
@@ -28,8 +30,20 @@ export default function UsuariosClient({
   predictions: Prediction[];
 }) {
   const router = useRouter();
+  const [changingRole, setChangingRole] = useState(false);
   const predMap = new Map(predictions.map(p => [p.match_id, p]));
   const selectedUser = users.find(u => u.id === selectedUserId);
+
+  async function handleRoleChange(newRole: "employee" | "client") {
+    if (!selectedUser) return;
+    setChangingRole(true);
+    try {
+      await changeUserRole(selectedUser.id, newRole);
+      router.refresh();
+    } finally {
+      setChangingRole(false);
+    }
+  }
 
   const totalPoints = predictions.reduce((s, p) => s + (p.points_earned ?? 0), 0);
   const filled = predictions.length;
@@ -47,7 +61,7 @@ export default function UsuariosClient({
           <option value="">— Seleccionar usuario —</option>
           {users.map(u => (
             <option key={u.id} value={u.id}>
-              {u.alias} ({u.role === "employee" ? "emp" : "cli"})
+              {u.alias} — {u.email} ({u.role === "employee" ? "emp" : "cli"})
             </option>
           ))}
         </select>
@@ -55,6 +69,30 @@ export default function UsuariosClient({
 
       {selectedUser && (
         <>
+          {/* Info + cambio de rol */}
+          <div className="bg-[#110828] border border-[#1e0e42] rounded-xl px-4 py-3 flex items-center justify-between gap-3">
+            <div className="min-w-0">
+              <p className="text-white font-bold text-sm">{selectedUser.alias}</p>
+              <p className="text-[#4c2a8a] text-xs truncate">{selectedUser.email}</p>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                selectedUser.role === "employee"
+                  ? "bg-violet-500/20 text-violet-300"
+                  : "bg-blue-500/20 text-blue-300"
+              }`}>
+                {selectedUser.role === "employee" ? "Empleado" : "Cliente"}
+              </span>
+              <button
+                onClick={() => handleRoleChange(selectedUser.role === "employee" ? "client" : "employee")}
+                disabled={changingRole}
+                className="text-[10px] font-bold px-2 py-1 rounded-lg border border-[#2d1a5e] text-[#4c2a8a] hover:text-white hover:border-[#6b3db8] transition-colors disabled:opacity-40"
+              >
+                {changingRole ? "..." : `→ ${selectedUser.role === "employee" ? "Cliente" : "Empleado"}`}
+              </button>
+            </div>
+          </div>
+
           {/* Stats */}
           <div className="grid grid-cols-3 gap-2">
             <div className="bg-[#110828] border border-[#1e0e42] rounded-xl p-3 text-center">

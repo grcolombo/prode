@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import UsuariosClient from "./UsuariosClient";
 
 export default async function UsuariosPage({
@@ -7,14 +8,24 @@ export default async function UsuariosPage({
   searchParams: Promise<{ user_id?: string }>;
 }) {
   const supabase = await createClient();
+  const adminSupabase = createAdminClient();
   const { user_id } = await searchParams;
 
   // Todos los usuarios con alias
-  const { data: users } = await supabase
+  const { data: profiles } = await supabase
     .from("profiles")
     .select("id, alias, role")
     .not("alias", "is", null)
     .order("alias");
+
+  // Emails desde auth.users via admin client
+  const { data: authUsers } = await adminSupabase.auth.admin.listUsers({ perPage: 10000 });
+  const emailMap = new Map(authUsers?.users?.map(u => [u.id, u.email ?? ""]));
+
+  const users = (profiles ?? []).map(p => ({
+    ...p,
+    email: emailMap.get(p.id) ?? "",
+  }));
 
   // Si hay user_id seleccionado, traer sus datos
   let selectedPredictions = null;

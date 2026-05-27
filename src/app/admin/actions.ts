@@ -114,3 +114,18 @@ export async function deleteEmployeeEmail(email: string) {
 
   revalidatePath("/admin/emails");
 }
+
+// ─── Usuarios ─────────────────────────────────────────────────
+
+export async function changeUserRole(userId: string, newRole: "employee" | "client") {
+  const supabase = await assertAdmin();
+
+  const { error } = await supabase
+    .from("profiles")
+    .update({ role: newRole })
+    .eq("id", userId);
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/admin/usuarios");
+}
