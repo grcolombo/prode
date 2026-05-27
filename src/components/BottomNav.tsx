@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
 const NAV_ITEMS = [
@@ -52,6 +53,20 @@ const NAV_ITEMS = [
 export default function BottomNav() {
   const pathname = usePathname();
   const router = useRouter();
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) return;
+      supabase
+        .from("profiles")
+        .select("is_admin")
+        .eq("id", user.id)
+        .single()
+        .then(({ data }) => setIsAdmin(data?.is_admin ?? false));
+    });
+  }, []);
 
   async function handleLogout() {
     const supabase = createClient();
@@ -80,6 +95,27 @@ export default function BottomNav() {
             </Link>
           );
         })}
+
+        {/* Botón admin — solo visible para admins */}
+        {isAdmin && (
+          <>
+            <div className="flex items-center">
+              <div className="w-px h-6 bg-[#1e0e42]" />
+            </div>
+            <Link
+              href="/admin"
+              className="px-3 flex flex-col items-center justify-center gap-1 text-[#6b3db8] hover:text-[#9b6ee0] transition-colors"
+              title="Panel Admin"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+                <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                <path d="M2 17l10 5 10-5" />
+                <path d="M2 12l10 5 10-5" />
+              </svg>
+              <span className="text-[10px] font-semibold">Admin</span>
+            </Link>
+          </>
+        )}
 
         {/* Separador + logout */}
         <div className="flex items-center">
