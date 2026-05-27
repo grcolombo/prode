@@ -9,7 +9,19 @@ export async function validateEmail(
   const normalized = email.trim().toLowerCase();
   const supabase = createAdminClient();
 
-  // Empleados: verificar en employee_emails (bypasean la verificación de Tarifar DB)
+  // Si ya completó onboarding (tiene alias) → acceso directo sin re-validar
+  const { data: existingUsers } = await supabase.auth.admin.listUsers({ perPage: 10000 });
+  const authUser = existingUsers?.users?.find(u => u.email === normalized);
+  if (authUser) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('alias')
+      .eq('id', authUser.id)
+      .maybeSingle();
+    if (profile?.alias) return { valid: true };
+  }
+
+  // Empleados: verificar en employee_emails
   const { data: emp } = await supabase
     .from('employee_emails')
     .select('email')
@@ -18,7 +30,7 @@ export async function validateEmail(
 
   if (emp) return { valid: true };
 
-  // Clientes: verificar en Tarifar 4.0 (active = true, free = false)
+  // Clientes nuevos: verificar en Tarifar 4.0 (active = true, free = false)
   try {
     const active = await isActiveTarifarUser(normalized);
     return { valid: active };
