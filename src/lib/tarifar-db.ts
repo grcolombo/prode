@@ -16,7 +16,15 @@ function getPool(): Pool {
 
 export async function isActiveTarifarUser(email: string): Promise<boolean> {
   const result = await getPool().query(
-    'SELECT 1 FROM users WHERE username = $1 AND active = true AND free_user = false LIMIT 1',
+    `SELECT 1
+     FROM users u
+     JOIN iara.fizz_activations fa ON fa.id = u.fizz_activation_id
+     WHERE u.username = $1
+       AND u.active = true
+       AND u.free_user = false
+       AND fa.sub_fecha_exp IS NOT NULL
+       AND fa.sub_fecha_exp >= CURRENT_DATE
+     LIMIT 1`,
     [email.toLowerCase()]
   );
   return (result.rowCount ?? 0) > 0;
