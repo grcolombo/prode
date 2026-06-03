@@ -134,13 +134,10 @@ export default async function RankingPage() {
                           {above !== null && above > 0 && (
                             <div className="text-red-400/70">▲ {above} pts arriba</div>
                           )}
-                          {above === 0 && (
-                            <div className="text-yellow-400/70">= Empatado</div>
-                          )}
                           {below !== null && below > 0 && (
                             <div className="text-green-400/70">▼ {below} pts abajo</div>
                           )}
-                          {below === 0 && (
+                          {(above === 0 || below === 0) && (
                             <div className="text-yellow-400/70">= Empatado</div>
                           )}
                         </div>

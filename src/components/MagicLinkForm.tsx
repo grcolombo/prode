@@ -67,6 +67,12 @@ export default function MagicLinkForm({ compact = false }: { compact?: boolean }
                 <span className="text-slate-500">Revisá también la carpeta de spam.</span>
               </p>
             </div>
+            <button
+              onClick={() => setStatus("idle")}
+              className="w-full border border-white/20 text-slate-300 font-semibold py-3 rounded-xl transition-colors hover:bg-white/5 text-sm"
+            >
+              Volver
+            </button>
           </div>
         </div>
       )}

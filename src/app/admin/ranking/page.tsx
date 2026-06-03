@@ -92,18 +92,17 @@ function calcPremios(rows: RankingRow[]) {
   // 2. Adivino — más exactos entre los que no son campeón
   const sortedExactos = [...restaCampeon].sort((a, b) => b.exact_results - a.exact_results);
   const adivino = sortedExactos[0] ?? null;
+
+  // 3. Menotista — más difícil (aciertos de goles), excluye campeón y adivino
   const restaAdivino = restaCampeon.filter(r => r.alias !== adivino?.alias);
-
-  // 3. Bilardista — más aciertos de ganador/empate entre los restantes
-  const sortedWinner = [...restaAdivino].sort((a, b) => b.correct_winner - a.correct_winner);
-  const bilardista = sortedWinner[0] ?? null;
-  const restaBilardista = restaAdivino.filter(r => r.alias !== bilardista?.alias);
-
-  // 4. Menotista — más aciertos de goles (local + visita) entre los restantes
-  // Si acierta los dos goles del partido (= exacto) suma 3 en lugar de 2
   const menotistaScore = (r: RankingRow) => r.home_goals + r.away_goals + r.exact_results;
-  const sortedGoles = [...restaBilardista].sort((a, b) => menotistaScore(b) - menotistaScore(a));
+  const sortedGoles = [...restaAdivino].sort((a, b) => menotistaScore(b) - menotistaScore(a));
   const menotista = sortedGoles[0] ?? null;
+
+  // 4. Bilardista — más fácil (solo ganador/empate), excluye campeón, adivino y menotista
+  const restaMetonista = restaAdivino.filter(r => r.alias !== menotista?.alias);
+  const sortedWinner = [...restaMetonista].sort((a, b) => b.correct_winner - a.correct_winner);
+  const bilardista = sortedWinner[0] ?? null;
 
   return { campeon, adivino, bilardista, menotista };
 }
