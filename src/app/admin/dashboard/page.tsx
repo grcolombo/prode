@@ -41,9 +41,9 @@ function calcPremios(rows: RankingRow[]) {
   const restaBilardista = restaAdivino.filter(r => r.alias !== bilardista?.alias);
 
   // 4. Menotista — más aciertos de goles (local + visita) entre los restantes
-  const sortedGoles = [...restaBilardista].sort(
-    (a, b) => (b.home_goals + b.away_goals) - (a.home_goals + a.away_goals)
-  );
+  // Si acierta los dos goles del partido (= exacto) suma 3 en lugar de 2
+  const menotistaScore = (r: RankingRow) => r.home_goals + r.away_goals + r.exact_results;
+  const sortedGoles = [...restaBilardista].sort((a, b) => menotistaScore(b) - menotistaScore(a));
   const menotista = sortedGoles[0] ?? null;
 
   return { campeon, adivino, bilardista, menotista };
@@ -122,7 +122,7 @@ function PremiosSection({ rows, label }: { rows: RankingRow[]; label: string }) 
         emoji="⚽"
         titulo="El Menotista"
         alias={premios.menotista?.alias ?? null}
-        stat={(premios.menotista?.home_goals ?? 0) + (premios.menotista?.away_goals ?? 0)}
+        stat={(premios.menotista?.home_goals ?? 0) + (premios.menotista?.away_goals ?? 0) + (premios.menotista?.exact_results ?? 0)}
         statLabel="goles exactos"
       />
     </div>
