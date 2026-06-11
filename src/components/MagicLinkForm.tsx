@@ -1,18 +1,36 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { validateEmail } from "@/app/actions";
 
-type Status = "idle" | "validating" | "link_sent" | "invalid" | "error";
+type Status =
+  | "idle"
+  | "validating"
+  | "code_sent"
+  | "verifying"
+  | "invalid"
+  | "error";
 
 export default function MagicLinkForm({ compact = false }: { compact?: boolean }) {
   const [email, setEmail] = useState("");
+  const [code, setCode] = useState("");
   const [status, setStatus] = useState<Status>("idle");
+  const [codeError, setCodeError] = useState("");
 
   const isValidFormat = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+  const isValidCode = /^\d{6,8}$/.test(code.trim());
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function sendCode() {
+    const supabase = createClient();
+    const { error } = await supabase.auth.signInWithOtp({
+      email: email.trim(),
+      options: { shouldCreateUser: true },
+    });
+    return error;
+  }
+
+  async function handleSubmitEmail(e: React.FormEvent) {
     e.preventDefault();
     if (!isValidFormat) return;
 
@@ -30,20 +48,47 @@ export default function MagicLinkForm({ compact = false }: { compact?: boolean }
       return;
     }
 
-    // Usuario válido → enviar magic link
+    // Usuario válido → enviar código de acceso
+    const error = await sendCode();
+    setStatus(error ? "error" : "code_sent");
+  }
+
+  async function handleSubmitCode(e: React.FormEvent) {
+    e.preventDefault();
+    if (!isValidCode) return;
+
+    setStatus("verifying");
+    setCodeError("");
+
     const supabase = createClient();
-    const { error } = await supabase.auth.signInWithOtp({
+    const { error } = await supabase.auth.verifyOtp({
       email: email.trim(),
-      options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+      token: code.trim(),
+      type: "email",
     });
 
-    setStatus(error ? "error" : "link_sent");
+    if (error) {
+      setCodeError("El código es incorrecto o venció. Revisá el email o pedí uno nuevo.");
+      setStatus("code_sent");
+      return;
+    }
+
+    // Sesión creada → el middleware enruta a /onboarding o /fixture según corresponda
+    window.location.href = "/fixture";
+  }
+
+  async function handleResend() {
+    setCode("");
+    setCodeError("");
+    setStatus("validating");
+    const error = await sendCode();
+    setStatus(error ? "error" : "code_sent");
   }
 
   return (
     <>
-      {/* Overlay: usuario validado / link enviado */}
-      {status === "link_sent" && (
+      {/* Overlay: ingresar código */}
+      {(status === "code_sent" || status === "verifying") && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm px-4 pb-20 sm:pb-0">
           <div className="w-full max-w-sm bg-[#2d1a5e] border border-white/20 rounded-2xl flex flex-col gap-5 p-6">
             <div className="flex flex-col items-center gap-3 text-center">
@@ -55,20 +100,54 @@ export default function MagicLinkForm({ compact = false }: { compact?: boolean }
               <div>
                 <h2 className="text-white font-black text-lg">¡Usuario validado!</h2>
                 <p className="text-slate-300 text-sm mt-1">
-                  Te enviamos el link de acceso a
+                  Te enviamos un código de acceso a
                 </p>
                 <p className="text-white font-semibold text-sm">{email.trim()}</p>
               </div>
             </div>
-            <div className="bg-[#1e0e42] border border-white/20 rounded-xl px-4 py-3 text-center">
-              <p className="text-slate-400 text-xs">
-                Abrí el email y hacé clic en el link para ingresar al Prode.
-                <br />
-                <span className="text-slate-500">Revisá también la carpeta de spam.</span>
+
+            <form onSubmit={handleSubmitCode} className="flex flex-col gap-3">
+              <input
+                type="text"
+                inputMode="numeric"
+                autoComplete="one-time-code"
+                value={code}
+                onChange={(e) => {
+                  setCode(e.target.value.replace(/\D/g, "").slice(0, 8));
+                  setCodeError("");
+                }}
+                placeholder="––––––––"
+                disabled={status === "verifying"}
+                className="bg-[#1e0e42] border border-white/20 rounded-xl px-4 py-3 text-white text-center text-2xl tracking-[0.35em] font-black placeholder-white/20 focus:outline-none focus:border-[#6b3db8] transition-all disabled:opacity-50"
+              />
+              {codeError && (
+                <p className="text-red-400 text-xs text-center">{codeError}</p>
+              )}
+              <button
+                type="submit"
+                disabled={!isValidCode || status === "verifying"}
+                className="w-full bg-[#6b3db8] hover:bg-[#7c4ac9] text-white font-semibold py-3 rounded-xl transition-all active:scale-[0.98] disabled:opacity-30 disabled:cursor-not-allowed text-sm"
+              >
+                {status === "verifying" ? "Verificando..." : "Ingresar →"}
+              </button>
+            </form>
+
+            <div className="text-center">
+              <p className="text-slate-500 text-xs">
+                ¿No te llegó? Revisá el spam o{" "}
+                <button
+                  onClick={handleResend}
+                  disabled={status === "verifying"}
+                  className="text-[#c4a7f0] font-semibold hover:text-[#e0d0f8] transition-colors disabled:opacity-50"
+                >
+                  pedí otro código
+                </button>
+                .
               </p>
             </div>
+
             <button
-              onClick={() => setStatus("idle")}
+              onClick={() => { setStatus("idle"); setCode(""); setCodeError(""); }}
               className="w-full border border-white/20 text-slate-300 font-semibold py-3 rounded-xl transition-colors hover:bg-white/5 text-sm"
             >
               Volver
@@ -142,7 +221,7 @@ export default function MagicLinkForm({ compact = false }: { compact?: boolean }
       )}
 
       {/* Formulario */}
-      <form onSubmit={handleSubmit} className="flex flex-col gap-2">
+      <form onSubmit={handleSubmitEmail} className="flex flex-col gap-2">
         <input
           type="email"
           value={email}

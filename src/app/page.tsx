@@ -2,7 +2,14 @@
 import Countdown from "@/components/Countdown";
 import MagicLinkForm from "@/components/MagicLinkForm";
 
-export default function Home() {
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
+  const { error } = await searchParams;
+  const linkExpired = error === "auth";
+
   return (
     <main className="relative h-screen bg-[#442d8e] text-white flex flex-col overflow-hidden">
 
@@ -52,9 +59,15 @@ export default function Home() {
 
         {/* CTA */}
         <div className="flex flex-col gap-3">
+          {linkExpired && (
+            <div className="bg-red-500/10 border border-red-500/30 rounded-xl px-4 py-3 text-center">
+              <p className="text-red-300 text-sm font-semibold">El link expiró o ya fue usado</p>
+              <p className="text-slate-400 text-xs mt-1">Pedí uno nuevo ingresando tu email.</p>
+            </div>
+          )}
           <div className="text-center space-y-0.5">
             <p className="text-white font-semibold text-sm">Ingresá con tu cuenta de Tarifar 4.0</p>
-            <p className="text-slate-400 text-xs">Te enviamos un link a tu email para acceder</p>
+            <p className="text-slate-400 text-xs">Te enviamos un código a tu email para acceder</p>
           </div>
           <MagicLinkForm />
         </div>
