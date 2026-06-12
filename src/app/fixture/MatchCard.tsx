@@ -163,36 +163,51 @@ export default function MatchCard({ match, prediction, locked }: Props) {
         </div>
       </div>
 
-      {/* Footer: save button or points */}
-      <div className="mt-2 flex justify-center min-h-[20px]">
-        {match.is_played && pts !== undefined && pts !== null ? (
-          <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
-            pts === 12
-              ? "bg-yellow-500/15 text-yellow-400"
-              : pts > 0
-                ? "bg-green-500/15 text-green-400"
-                : "text-white/20"
-          }`}>
-            {pts === 12 ? "⭐ 12 pts" : pts > 0 ? `+${pts} pts` : "0 pts"}
+      {/* Footer: save button / points / tu pronóstico */}
+      {match.is_played ? (
+        <div className="mt-2 flex items-center justify-between gap-2 min-h-[20px]">
+          <span className="text-[10px] text-[#c4a7f0]">
+            {prediction
+              ? <>Tu pronóstico: <span className="font-bold text-white/80">{prediction.home_score}-{prediction.away_score}</span></>
+              : "No pronosticaste"}
           </span>
-        ) : !locked && !match.is_played ? (
-          <button
-            onClick={handleSave}
-            disabled={!canSave || status === "saving"}
-            className={`text-[11px] px-3 py-0.5 rounded-lg transition-all ${
-              status === "saved" ? "text-green-400" :
-              status === "error" ? "text-red-400" :
-              canSave ? "text-[#e0d0f8] hover:text-white active:scale-95" :
-              "text-white/20 cursor-not-allowed"
-            }`}
-          >
-            {status === "saving" ? "Guardando..." :
-             status === "saved" ? "✓ Guardado" :
-             status === "error" ? "Error, reintentá" :
-             "Guardar"}
-          </button>
-        ) : null}
-      </div>
+          {pts !== undefined && pts !== null && (
+            <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
+              pts === 12
+                ? "bg-yellow-500/15 text-yellow-400"
+                : pts > 0
+                  ? "bg-green-500/15 text-green-400"
+                  : "text-white/20"
+            }`}>
+              {pts === 12 ? "⭐ 12 pts" : pts > 0 ? `+${pts} pts` : "0 pts"}
+            </span>
+          )}
+        </div>
+      ) : (
+        <div className="mt-2 flex justify-center min-h-[20px]">
+          {!locked ? (
+            <button
+              onClick={handleSave}
+              disabled={!canSave || status === "saving"}
+              className={`text-[11px] px-3 py-0.5 rounded-lg transition-all ${
+                status === "saved" ? "text-green-400" :
+                status === "error" ? "text-red-400" :
+                canSave ? "text-[#e0d0f8] hover:text-white active:scale-95" :
+                "text-white/20 cursor-not-allowed"
+              }`}
+            >
+              {status === "saving" ? "Guardando..." :
+               status === "saved" ? "✓ Guardado" :
+               status === "error" ? "Error, reintentá" :
+               "Guardar"}
+            </button>
+          ) : (
+            <span className="text-[10px] text-[#c4a7f0]">
+              {prediction ? "Tu pronóstico" : "No pronosticaste"}
+            </span>
+          )}
+        </div>
+      )}
     </div>
   );
 }
