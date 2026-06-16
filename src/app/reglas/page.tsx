@@ -22,6 +22,24 @@ const TIEBREAKERS = [
   "Más aciertos de goles visitante",
 ];
 
+const PRIZES = [
+  {
+    emoji: "🔮",
+    name: "El Adivino",
+    rule: "Premia al que más veces clava el resultado exacto (los dos marcadores). Cada acierto exacto vale 1.",
+  },
+  {
+    emoji: "⚽",
+    name: "El Menotista",
+    rule: "Premia al que más le pega a la cantidad de goles. Suma 1 por cada equipo cuyo marcador acertás; clavar el resultado exacto vale 3 (los dos equipos + bonus). No importa quién gana.",
+  },
+  {
+    emoji: "🧱",
+    name: "El Bilardista",
+    rule: "Premia al que más acierta quién gana (o el empate), sin importar el marcador. Cada acierto de ganador/empate vale 1.",
+  },
+];
+
 export default function ReglasPage() {
   return (
     <main className="relative min-h-screen bg-[#442d8e] text-white pb-16">
@@ -100,6 +118,29 @@ export default function ReglasPage() {
               </div>
             ))}
           </div>
+        </section>
+
+        <section className="flex flex-col gap-3">
+          <h2 className="text-xs font-bold text-[#c4a7f0] uppercase tracking-widest">
+            Premios especiales
+          </h2>
+          <div className="flex flex-col gap-2">
+            {PRIZES.map(({ emoji, name, rule }) => (
+              <div
+                key={name}
+                className="bg-[#2d1a5e] border border-white/10 rounded-xl px-4 py-3 flex gap-3"
+              >
+                <span className="text-2xl shrink-0">{emoji}</span>
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-white font-bold text-sm">{name}</span>
+                  <span className="text-xs text-[#d4c0f0] leading-relaxed">{rule}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="text-[#c4a7f0] text-xs px-1">
+            Estos conteos son independientes de los puntos del juego principal.
+          </p>
         </section>
 
         <section className="flex flex-col gap-3">

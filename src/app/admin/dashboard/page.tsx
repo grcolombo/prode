@@ -128,6 +128,69 @@ function PremiosSection({ rows, label }: { rows: RankingRow[]; label: string }) 
   );
 }
 
+// keys[0] es la métrica principal (y la que se muestra); las siguientes son
+// los criterios de desempate, en orden, todos descendente.
+function CategoryTop5({
+  rows,
+  title,
+  emoji,
+  keys,
+  statLabel,
+}: {
+  rows: RankingRow[];
+  title: string;
+  emoji: string;
+  keys: ((r: RankingRow) => number)[];
+  statLabel: string;
+}) {
+  const posLabels = ["🥇", "🥈", "🥉", "4°", "5°"];
+  const posColors = ["text-yellow-400", "text-slate-300", "text-amber-600", "text-[#e0d0f8]", "text-[#e0d0f8]"];
+  const cmp = (a: RankingRow, b: RankingRow) => {
+    for (const k of keys) {
+      const d = k(b) - k(a);
+      if (d !== 0) return d;
+    }
+    return 0;
+  };
+  const metric = keys[0];
+  const sorted = [...rows].sort(cmp).slice(0, 5);
+  return (
+    <div className="bg-[#2d1a5e] border border-white/10 rounded-xl p-4 flex flex-col gap-2">
+      <h3 className="text-xs font-bold text-[#c4a7f0] uppercase tracking-wider flex items-center gap-1.5">
+        <span>{emoji}</span>{title}
+      </h3>
+      {sorted.length === 0 ? (
+        <p className="text-slate-400 text-xs text-center py-2">Sin datos aún</p>
+      ) : (
+        sorted.map((r, i) => (
+          <div key={r.alias} className="flex items-center gap-2">
+            <span className={`text-sm w-6 text-center font-black ${posColors[i]}`}>{posLabels[i]}</span>
+            <span className="flex-1 text-sm text-[#d4c0f0] font-semibold truncate">{r.alias}</span>
+            <span className="text-white font-black text-sm">{metric(r)}</span>
+            <span className="text-slate-400 text-[10px] w-12 text-right">{statLabel}</span>
+          </div>
+        ))
+      )}
+    </div>
+  );
+}
+
+function CategoryTop5Group({ rows, label }: { rows: RankingRow[]; label: string }) {
+  const exact = (r: RankingRow) => r.exact_results;
+  const home = (r: RankingRow) => r.home_goals;
+  const away = (r: RankingRow) => r.away_goals;
+  const winner = (r: RankingRow) => r.correct_winner;
+  const menotista = (r: RankingRow) => r.home_goals + r.away_goals + r.exact_results;
+  return (
+    <div className="flex flex-col gap-3">
+      <h3 className="text-xs font-bold text-[#c4a7f0] uppercase tracking-widest">{label}</h3>
+      <CategoryTop5 rows={rows} title="El Adivino" emoji="🔮" statLabel="exactos" keys={[exact, home, away, winner]} />
+      <CategoryTop5 rows={rows} title="El Menotista" emoji="⚽" statLabel="goles" keys={[menotista, exact, home, away]} />
+      <CategoryTop5 rows={rows} title="El Bilardista" emoji="🧱" statLabel="gan/emp" keys={[winner, exact, home, away]} />
+    </div>
+  );
+}
+
 function RankingMiniTable({ rows, title }: { rows: RankingRow[]; title: string }) {
   const posLabels = ["🥇", "🥈", "🥉", "4°", "5°"];
   const posColors = ["text-yellow-400", "text-slate-300", "text-amber-600", "text-[#e0d0f8]", "text-[#e0d0f8]"];
@@ -218,6 +281,15 @@ export default async function AdminDashboardPage() {
         <div className="grid md:grid-cols-2 gap-6">
           <PremiosSection rows={employees} label="Empleados" />
           <PremiosSection rows={clients} label="Clientes" />
+        </div>
+      </section>
+
+      {/* Top 5 por categoría — para publicar en redes */}
+      <section className="flex flex-col gap-4">
+        <h2 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Top 5 por categoría</h2>
+        <div className="grid md:grid-cols-2 gap-6">
+          <CategoryTop5Group rows={employees} label="Empleados" />
+          <CategoryTop5Group rows={clients} label="Clientes" />
         </div>
       </section>
 
