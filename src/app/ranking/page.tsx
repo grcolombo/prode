@@ -4,17 +4,9 @@ import Link from "next/link";
 import BottomNav from "@/components/BottomNav";
 import RealtimeRefresher from "@/components/RealtimeRefresher";
 import TermsOverlay from "@/components/TermsOverlay";
+import { buildCareerTables, menotistaScore, type RankingRow } from "@/lib/premios";
 
 const DEADLINE = new Date("2026-06-11T19:00:00Z");
-
-type RankingRow = {
-  alias: string;
-  total_points: number;
-  exact_results: number;
-  correct_winner: number;
-  home_goals: number;
-  away_goals: number;
-};
 
 const posColors = ["text-yellow-400", "text-slate-300", "text-amber-600"];
 const posLabels = ["1°", "2°", "3°"];
@@ -128,11 +120,10 @@ export default async function RankingPage() {
   const title = profile.role === "employee" ? "Ranking Empleados" : "Ranking Clientes";
   const isPastDeadline = new Date() > DEADLINE;
 
-  // Tablas ordenadas por cada criterio
-  const byPuntos    = [...rows]; // ya viene ordenado por total_points
-  const byExactos   = [...rows].sort((a, b) => b.exact_results - a.exact_results || b.total_points - a.total_points);
-  const byMenotista = [...rows].sort((a, b) => (b.home_goals + b.away_goals + b.exact_results) - (a.home_goals + a.away_goals + a.exact_results));
-  const byBilardista = [...rows].sort((a, b) => b.correct_winner - a.correct_winner);
+  // Tablas en cascada: cada participante lidera una sola carrera (el ganador de
+  // una carrera de mayor jerarquía se excluye de las siguientes).
+  const { campeones: byPuntos, adivino: byExactos, menotista: byMenotista, bilardista: byBilardista } =
+    buildCareerTables(rows);
 
   return (
     <main className="relative min-h-screen bg-[#442d8e] text-white pb-16">
@@ -181,7 +172,7 @@ export default async function RankingPage() {
               subtitulo="Goles acertados por equipo"
               sorted={byMenotista}
               myAlias={profile.alias}
-              statFn={r => r.home_goals + r.away_goals + r.exact_results}
+              statFn={menotistaScore}
               statLabel="pts"
               isPastDeadline={isPastDeadline}
             />

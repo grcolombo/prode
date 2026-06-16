@@ -1,5 +1,6 @@
 ﻿import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
+import { buildCareerTables } from "@/lib/premios";
 
 type RankingRow = {
   alias: string;
@@ -83,28 +84,13 @@ function RankingTable({ rows, title }: { rows: RankingRow[]; title: string }) {
 }
 
 function calcPremios(rows: RankingRow[]) {
-  if (rows.length === 0) return { campeon: null, adivino: null, bilardista: null, menotista: null };
-
-  // 1. Campeón — 1° del ranking (ya viene ordenado por total_points)
-  const campeon = rows[0];
-  const restaCampeon = rows.slice(1);
-
-  // 2. Adivino — más exactos entre los que no son campeón
-  const sortedExactos = [...restaCampeon].sort((a, b) => b.exact_results - a.exact_results);
-  const adivino = sortedExactos[0] ?? null;
-
-  // 3. Menotista — más difícil (aciertos de goles), excluye campeón y adivino
-  const restaAdivino = restaCampeon.filter(r => r.alias !== adivino?.alias);
-  const menotistaScore = (r: RankingRow) => r.home_goals + r.away_goals + r.exact_results;
-  const sortedGoles = [...restaAdivino].sort((a, b) => menotistaScore(b) - menotistaScore(a));
-  const menotista = sortedGoles[0] ?? null;
-
-  // 4. Bilardista — más fácil (solo ganador/empate), excluye campeón, adivino y menotista
-  const restaMetonista = restaAdivino.filter(r => r.alias !== menotista?.alias);
-  const sortedWinner = [...restaMetonista].sort((a, b) => b.correct_winner - a.correct_winner);
-  const bilardista = sortedWinner[0] ?? null;
-
-  return { campeon, adivino, bilardista, menotista };
+  const t = buildCareerTables(rows);
+  return {
+    campeon: t.campeones[0] ?? null,
+    adivino: t.adivino[0] ?? null,
+    menotista: t.menotista[0] ?? null,
+    bilardista: t.bilardista[0] ?? null,
+  };
 }
 
 export default async function AdminRankingPage() {

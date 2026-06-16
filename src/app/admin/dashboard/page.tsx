@@ -1,13 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-
-type RankingRow = {
-  alias: string;
-  total_points: number;
-  exact_results: number;
-  correct_winner: number;
-  home_goals: number;
-  away_goals: number;
-};
+import { buildCareerTables, menotistaScore, type RankingRow } from "@/lib/premios";
 
 type GeneralStats = {
   total_users: number;
@@ -22,30 +14,15 @@ type GeneralStats = {
   most_exact_match: { home_team: string; away_team: string; home_score_real: number; away_score_real: number; count: number } | null;
 };
 
-// ── Lógica de premios en cascada (igual que /admin/ranking) ──────────────────
+// ── Lógica de premios en cascada (compartida con /ranking) ───────────────────
 function calcPremios(rows: RankingRow[]) {
-  if (rows.length === 0) return { campeon: null, adivino: null, bilardista: null, menotista: null };
-
-  // 1. Campeón — 1° del ranking (ya viene ordenado por total_points)
-  const campeon = rows[0];
-  const restaCampeon = rows.slice(1);
-
-  // 2. Adivino — más exactos entre los que no son campeón
-  const sortedExactos = [...restaCampeon].sort((a, b) => b.exact_results - a.exact_results);
-  const adivino = sortedExactos[0] ?? null;
-
-  // 3. Menotista — más difícil (aciertos de goles), excluye campeón y adivino
-  const restaAdivino = restaCampeon.filter(r => r.alias !== adivino?.alias);
-  const menotistaScore = (r: RankingRow) => r.home_goals + r.away_goals + r.exact_results;
-  const sortedGoles = [...restaAdivino].sort((a, b) => menotistaScore(b) - menotistaScore(a));
-  const menotista = sortedGoles[0] ?? null;
-
-  // 4. Bilardista — más fácil (solo ganador/empate), excluye campeón, adivino y menotista
-  const restaMetonista = restaAdivino.filter(r => r.alias !== menotista?.alias);
-  const sortedWinner = [...restaMetonista].sort((a, b) => b.correct_winner - a.correct_winner);
-  const bilardista = sortedWinner[0] ?? null;
-
-  return { campeon, adivino, bilardista, menotista };
+  const t = buildCareerTables(rows);
+  return {
+    campeon: t.campeones[0] ?? null,
+    adivino: t.adivino[0] ?? null,
+    menotista: t.menotista[0] ?? null,
+    bilardista: t.bilardista[0] ?? null,
+  };
 }
 
 // ── Componentes ──────────────────────────────────────────────────────────────
@@ -128,41 +105,32 @@ function PremiosSection({ rows, label }: { rows: RankingRow[]; label: string }) 
   );
 }
 
-// keys[0] es la métrica principal (y la que se muestra); las siguientes son
-// los criterios de desempate, en orden, todos descendente.
+// Recibe la tabla ya ordenada y filtrada por la cascada; solo muestra el top 5.
 function CategoryTop5({
-  rows,
+  sorted,
   title,
   emoji,
-  keys,
+  metric,
   statLabel,
 }: {
-  rows: RankingRow[];
+  sorted: RankingRow[];
   title: string;
   emoji: string;
-  keys: ((r: RankingRow) => number)[];
+  metric: (r: RankingRow) => number;
   statLabel: string;
 }) {
   const posLabels = ["🥇", "🥈", "🥉", "4°", "5°"];
   const posColors = ["text-yellow-400", "text-slate-300", "text-amber-600", "text-[#e0d0f8]", "text-[#e0d0f8]"];
-  const cmp = (a: RankingRow, b: RankingRow) => {
-    for (const k of keys) {
-      const d = k(b) - k(a);
-      if (d !== 0) return d;
-    }
-    return 0;
-  };
-  const metric = keys[0];
-  const sorted = [...rows].sort(cmp).slice(0, 5);
+  const top5 = sorted.slice(0, 5);
   return (
     <div className="bg-[#2d1a5e] border border-white/10 rounded-xl p-4 flex flex-col gap-2">
       <h3 className="text-xs font-bold text-[#c4a7f0] uppercase tracking-wider flex items-center gap-1.5">
         <span>{emoji}</span>{title}
       </h3>
-      {sorted.length === 0 ? (
+      {top5.length === 0 ? (
         <p className="text-slate-400 text-xs text-center py-2">Sin datos aún</p>
       ) : (
-        sorted.map((r, i) => (
+        top5.map((r, i) => (
           <div key={r.alias} className="flex items-center gap-2">
             <span className={`text-sm w-6 text-center font-black ${posColors[i]}`}>{posLabels[i]}</span>
             <span className="flex-1 text-sm text-[#d4c0f0] font-semibold truncate">{r.alias}</span>
@@ -176,17 +144,13 @@ function CategoryTop5({
 }
 
 function CategoryTop5Group({ rows, label }: { rows: RankingRow[]; label: string }) {
-  const exact = (r: RankingRow) => r.exact_results;
-  const home = (r: RankingRow) => r.home_goals;
-  const away = (r: RankingRow) => r.away_goals;
-  const winner = (r: RankingRow) => r.correct_winner;
-  const menotista = (r: RankingRow) => r.home_goals + r.away_goals + r.exact_results;
+  const { adivino, menotista, bilardista } = buildCareerTables(rows);
   return (
     <div className="flex flex-col gap-3">
       <h3 className="text-xs font-bold text-[#c4a7f0] uppercase tracking-widest">{label}</h3>
-      <CategoryTop5 rows={rows} title="El Adivino" emoji="🔮" statLabel="exactos" keys={[exact, home, away, winner]} />
-      <CategoryTop5 rows={rows} title="El Menotista" emoji="⚽" statLabel="goles" keys={[menotista, exact, home, away]} />
-      <CategoryTop5 rows={rows} title="El Bilardista" emoji="🧱" statLabel="gan/emp" keys={[winner, exact, home, away]} />
+      <CategoryTop5 sorted={adivino} title="El Adivino" emoji="🔮" statLabel="exactos" metric={(r) => r.exact_results} />
+      <CategoryTop5 sorted={menotista} title="El Menotista" emoji="⚽" statLabel="goles" metric={menotistaScore} />
+      <CategoryTop5 sorted={bilardista} title="El Bilardista" emoji="🧱" statLabel="gan/emp" metric={(r) => r.correct_winner} />
     </div>
   );
 }
