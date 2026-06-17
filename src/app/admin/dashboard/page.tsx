@@ -155,12 +155,15 @@ function CategoryTop5Group({ rows, label }: { rows: RankingRow[]; label: string 
   );
 }
 
-function RankingMiniTable({ rows, title }: { rows: RankingRow[]; title: string }) {
+function RankingMiniTable({ rows, title, subtitle }: { rows: RankingRow[]; title: string; subtitle?: string }) {
   const posLabels = ["🥇", "🥈", "🥉", "4°", "5°"];
   const posColors = ["text-yellow-400", "text-slate-300", "text-amber-600", "text-[#e0d0f8]", "text-[#e0d0f8]"];
   return (
     <div className="bg-[#2d1a5e] border border-white/10 rounded-xl p-4 flex flex-col gap-2">
-      <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">{title}</h3>
+      <h3 className="text-xs font-bold text-[#c4a7f0] uppercase tracking-wider flex items-center gap-1.5">
+        <span>🏆</span>{title}
+        {subtitle && <span className="text-slate-400 normal-case font-semibold">· {subtitle}</span>}
+      </h3>
       {rows.length === 0 ? (
         <p className="text-slate-400 text-xs text-center py-2">Sin datos aún</p>
       ) : (
@@ -205,6 +208,35 @@ export default async function AdminDashboardPage() {
   return (
     <div className="flex flex-col gap-8">
       <h1 className="text-xl font-black">Dashboard</h1>
+
+      {/* Imágenes para redes */}
+      <section className="flex flex-col gap-3">
+        <div>
+          <h2 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Imágenes para redes</h2>
+          <p className="text-slate-400 text-xs mt-1">Top 5 de clientes en cada marco. Tocá para abrir la imagen y guardarla.</p>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          {[
+            { key: "campeones", label: "Carrera de Campeones", emoji: "🏆", color: "border-yellow-500/40" },
+            { key: "adivino", label: "El Adivino", emoji: "🔮", color: "border-purple-400/40" },
+            { key: "menotista", label: "El Menotista", emoji: "⚽", color: "border-fuchsia-500/40" },
+            { key: "bilardista", label: "El Bilardista", emoji: "🛡️", color: "border-orange-500/40" },
+          ].map((c) => (
+            <a
+              key={c.key}
+              href={`/admin/redes/${c.key}`}
+              download={`prode-${c.key}.png`}
+              className={`flex items-center gap-2 bg-[#2d1a5e] border ${c.color} rounded-xl px-4 py-3 hover:bg-[#1e0e42] transition-colors`}
+            >
+              <span className="text-2xl shrink-0">{c.emoji}</span>
+              <div className="flex flex-col min-w-0">
+                <span className="text-white font-bold text-sm truncate">{c.label}</span>
+                <span className="text-[#c4a7f0] text-[10px]">Descargar ↓</span>
+              </div>
+            </a>
+          ))}
+        </div>
+      </section>
 
       {/* Resumen general */}
       <section className="flex flex-col gap-3">
@@ -261,8 +293,8 @@ export default async function AdminDashboardPage() {
       <section className="flex flex-col gap-3">
         <h2 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Rankings</h2>
         <div className="grid sm:grid-cols-2 gap-3">
-          <RankingMiniTable rows={employees} title="Empleados" />
-          <RankingMiniTable rows={clients} title="Clientes" />
+          <RankingMiniTable rows={employees} title="Carrera de Campeones" subtitle="Empleados" />
+          <RankingMiniTable rows={clients} title="Carrera de Campeones" subtitle="Clientes" />
         </div>
       </section>
 
