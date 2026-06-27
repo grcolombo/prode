@@ -27,7 +27,7 @@ function formatDate(iso: string) {
 
 function stageLabel(stage: string, group: string | null) {
   if (stage === "group") return `Grupo ${group}`;
-  const map: Record<string, string> = { R32: "Ronda de 32", R16: "Octavos", QF: "Cuartos", SF: "Semis", final: "Final" };
+  const map: Record<string, string> = { r32: "Dieciseisavos", r16: "Octavos", qf: "Cuartos", sf: "Semis", third: "3er Puesto", final: "Final" };
   return map[stage] ?? stage;
 }
 

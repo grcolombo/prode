@@ -36,6 +36,7 @@ function Flag({ emoji }: { emoji: string }) {
 
 type Match = {
   id: number;
+  slot_label: string | null;
   home_team: string | null;
   away_team: string | null;
   home_flag: string | null;
@@ -74,8 +75,9 @@ export default function MatchCard({ match, prediction, locked }: Props) {
   const [away, setAway] = useState(prediction?.away_score?.toString() ?? "");
   const [status, setStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
 
+  const teamsKnown = !!(match.home_team && match.away_team);
   const hasPrediction = prediction !== null || status === "saved";
-  const canSave = home !== "" && away !== "" && !locked && !match.is_played;
+  const canSave = home !== "" && away !== "" && !locked && !match.is_played && teamsKnown;
 
   async function handleSave() {
     if (!canSave) return;
@@ -101,13 +103,23 @@ export default function MatchCard({ match, prediction, locked }: Props) {
     }`}>
       <div className="flex items-center justify-between mb-2">
         <p className="text-[#c4a7f0] text-[10px]">{formatDate(match.scheduled_at)}</p>
-        {match.is_played && (
+        {match.is_played ? (
           <span className="text-[9px] font-bold uppercase tracking-wider text-green-500/70 bg-green-500/10 px-1.5 py-0.5 rounded-full">
             FIN
           </span>
-        )}
+        ) : !teamsKnown ? (
+          <span className="text-[9px] font-bold uppercase tracking-wider text-yellow-400/70 bg-yellow-400/10 px-1.5 py-0.5 rounded-full">
+            Pendiente
+          </span>
+        ) : null}
       </div>
 
+      {/* Cuando ninguno de los dos equipos está definido, mostrar slot_label */}
+      {!teamsKnown && !match.home_team && !match.away_team ? (
+        <p className="text-white/30 text-xs text-center py-1 italic">
+          {match.slot_label ?? "Equipos por confirmar"}
+        </p>
+      ) : (
       <div className="flex items-center gap-2">
         {/* Home */}
         <div className="flex-1 flex items-center justify-end gap-1.5 min-w-0">
@@ -162,9 +174,10 @@ export default function MatchCard({ match, prediction, locked }: Props) {
           </span>
         </div>
       </div>
+      )}
 
       {/* Footer: save button / points / tu pronóstico */}
-      {match.is_played ? (
+      {!teamsKnown && !match.is_played ? null : match.is_played ? (
         <div className="mt-2 flex items-center justify-between gap-2 min-h-[20px]">
           <span className="text-[10px] text-[#c4a7f0]">
             {prediction

@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import FixtureClient from "./FixtureClient";
 import RealtimeRefresher from "@/components/RealtimeRefresher";
 import TermsOverlay from "@/components/TermsOverlay";
+import KnockoutBanner from "@/components/KnockoutBanner";
 
 const GROUP_DEADLINE = new Date("2026-06-11T19:00:00Z");
 
@@ -16,7 +17,7 @@ export default async function FixturePage() {
     supabase.from("profiles").select("alias, accepted_terms, is_rezagado").eq("id", user.id).single(),
     supabase
       .from("matches")
-      .select("id,stage,group_name,round,match_number,home_team,away_team,home_flag,away_flag,scheduled_at,home_score_real,away_score_real,is_played")
+      .select("id,stage,group_name,round,match_number,slot_label,home_team,away_team,home_flag,away_flag,scheduled_at,home_score_real,away_score_real,is_played")
       .order("group_name")
       .order("round")
       .order("match_number"),
@@ -29,7 +30,7 @@ export default async function FixturePage() {
   // Calcular deadline por fase eliminatoria (primer partido de cada fase)
   const now = new Date();
   const stageDeadlines: Record<string, boolean> = { group: now >= GROUP_DEADLINE };
-  const knockoutStages = ["R32", "R16", "QF", "SF", "final"];
+  const knockoutStages = ["r32", "r16", "qf", "sf", "third", "final"];
   for (const stage of knockoutStages) {
     const first = (matches ?? [])
       .filter(m => m.stage === stage)
@@ -37,11 +38,14 @@ export default async function FixturePage() {
     stageDeadlines[stage] = first ? now >= new Date(first.scheduled_at) : false;
   }
 
+  const hasKnockout = (matches ?? []).some(m => m.stage !== "group");
+
   return (
     <>
       {!profile?.accepted_terms && (
         <TermsOverlay isRezagado={profile?.is_rezagado ?? false} />
       )}
+      {profile?.accepted_terms && hasKnockout && <KnockoutBanner />}
       <RealtimeRefresher tables={["matches", "predictions"]} />
       <FixtureClient
         matches={matches ?? []}

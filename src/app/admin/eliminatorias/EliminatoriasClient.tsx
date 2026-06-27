@@ -17,7 +17,7 @@ type Match = {
 
 const STAGE_ORDER = ["r32", "r16", "qf", "sf", "third", "final"];
 const STAGE_LABEL: Record<string, string> = {
-  r32: "Ronda de 32", r16: "Octavos de final", qf: "Cuartos de final",
+  r32: "Dieciseisavos de Final", r16: "Octavos de Final", qf: "Cuartos de Final",
   sf: "Semifinales", third: "3er puesto", final: "Final",
 };
 

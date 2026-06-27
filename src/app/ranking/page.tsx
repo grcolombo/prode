@@ -201,7 +201,7 @@ export default async function RankingPage() {
           <section className="flex flex-col gap-3 pt-2">
             <div>
               <h2 className="text-lg font-black tracking-tight">Tabla Rezagados</h2>
-              <p className="text-[#e0d0f8] text-xs mt-0.5">Solo cuentan puntos de R32 en adelante</p>
+              <p className="text-[#e0d0f8] text-xs mt-0.5">Solo cuentan puntos de Dieciseisavos en adelante</p>
             </div>
             <div className="flex flex-col gap-1.5">
               {rezagadosRows.map((row, i) => {

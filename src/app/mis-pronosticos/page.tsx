@@ -101,10 +101,11 @@ export default async function MisPronosticosPage() {
   // Historial por jornada — solo jornadas con al menos 1 partido jugado
   const stageLabel: Record<string, string> = {
     group: "Grupos",
-    R32: "Octavos",
-    R16: "Cuartos de final",
-    QF: "Semifinales",
-    SF: "Final / 3°",
+    r32: "Dieciseisavos",
+    r16: "Octavos",
+    qf: "Cuartos",
+    sf: "Semis",
+    third: "3er Puesto",
     final: "Final",
   };
 
