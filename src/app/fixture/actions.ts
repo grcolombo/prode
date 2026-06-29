@@ -36,12 +36,19 @@ export async function savePrediction(matchId: number, homeScore: number, awaySco
 
   const now = new Date();
 
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("is_rezagado")
+    .eq("id", user.id)
+    .single();
+  const isRezagado = profile?.is_rezagado ?? false;
+
   if (match.stage === "group") {
-    // Fase de grupos: deadline global
+    // Fase de grupos: deadline global (rezagados no pueden predecir grupos)
     if (now >= GROUP_DEADLINE) {
       return { error: "El fixture de grupos está cerrado." };
     }
-  } else {
+  } else if (!isRezagado) {
     // Fases eliminatorias: deadline = inicio del primer partido de esa fase
     const { data: firstMatch } = await supabase
       .from("matches")

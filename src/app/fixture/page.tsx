@@ -29,13 +29,18 @@ export default async function FixturePage() {
 
   // Calcular deadline por fase eliminatoria (primer partido de cada fase)
   const now = new Date();
+  const isRezagado = profile?.is_rezagado ?? false;
   const stageDeadlines: Record<string, boolean> = { group: now >= GROUP_DEADLINE };
   const knockoutStages = ["r32", "r16", "qf", "sf", "third", "final"];
   for (const stage of knockoutStages) {
-    const first = (matches ?? [])
-      .filter(m => m.stage === stage)
-      .sort((a, b) => new Date(a.scheduled_at).getTime() - new Date(b.scheduled_at).getTime())[0];
-    stageDeadlines[stage] = first ? now >= new Date(first.scheduled_at) : false;
+    const stageMatches = (matches ?? []).filter(m => m.stage === stage);
+    if (isRezagado) {
+      // Rezagados: bloqueado solo si todos los partidos de la fase ya jugaron
+      stageDeadlines[stage] = stageMatches.length > 0 && stageMatches.every(m => m.is_played);
+    } else {
+      const first = stageMatches.sort((a, b) => new Date(a.scheduled_at).getTime() - new Date(b.scheduled_at).getTime())[0];
+      stageDeadlines[stage] = first ? now >= new Date(first.scheduled_at) : false;
+    }
   }
 
   const hasKnockout = (matches ?? []).some(m => m.stage !== "group");
