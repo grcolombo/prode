@@ -17,6 +17,8 @@ export async function acceptTerms() {
 
 // Deadline global: inicio del primer partido de la fase de grupos
 const GROUP_DEADLINE = new Date("2026-06-11T19:00:00Z");
+// Gracia eliminatorias: ventana excepcional para carga tardía (30/06/2026 13:30 AR = 16:30 UTC)
+const KNOCKOUT_GRACE = new Date("2026-06-30T16:30:00Z");
 
 export async function savePrediction(matchId: number, homeScore: number, awayScore: number) {
   const supabase = await createClient();
@@ -48,18 +50,20 @@ export async function savePrediction(matchId: number, homeScore: number, awaySco
     if (now >= GROUP_DEADLINE) {
       return { error: "El fixture de grupos está cerrado." };
     }
-  } else if (!isRezagado) {
-    // Fases eliminatorias: deadline = inicio del primer partido de esa fase
-    const { data: firstMatch } = await supabase
-      .from("matches")
-      .select("scheduled_at")
-      .eq("stage", match.stage)
-      .order("scheduled_at", { ascending: true })
-      .limit(1)
-      .single();
+  } else {
+    // Fases eliminatorias: abierto si estamos dentro de la gracia, sino deadline = primer partido de la fase
+    if (now >= KNOCKOUT_GRACE) {
+      const { data: firstMatch } = await supabase
+        .from("matches")
+        .select("scheduled_at")
+        .eq("stage", match.stage)
+        .order("scheduled_at", { ascending: true })
+        .limit(1)
+        .single();
 
-    if (firstMatch && now >= new Date(firstMatch.scheduled_at)) {
-      return { error: "Los pronósticos de esta fase ya están cerrados." };
+      if (firstMatch && now >= new Date(firstMatch.scheduled_at)) {
+        return { error: "Los pronósticos de esta fase ya están cerrados." };
+      }
     }
   }
 

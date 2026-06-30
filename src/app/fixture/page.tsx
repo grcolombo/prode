@@ -27,6 +27,9 @@ export default async function FixturePage() {
       .eq("user_id", user.id),
   ]);
 
+  // Gracia eliminatorias: ventana excepcional para carga tardía (30/06/2026 13:30 AR = 16:30 UTC)
+  const KNOCKOUT_GRACE = new Date("2026-06-30T16:30:00Z");
+
   // Calcular deadline por fase eliminatoria (primer partido de cada fase)
   const now = new Date();
   const isRezagado = profile?.is_rezagado ?? false;
@@ -34,8 +37,8 @@ export default async function FixturePage() {
   const knockoutStages = ["r32", "r16", "qf", "sf", "third", "final"];
   for (const stage of knockoutStages) {
     const stageMatches = (matches ?? []).filter(m => m.stage === stage);
-    if (isRezagado) {
-      // Rezagados: bloqueado solo si todos los partidos de la fase ya jugaron
+    if (now < KNOCKOUT_GRACE || isRezagado) {
+      // Dentro de la gracia o rezagado: bloqueado solo si todos los partidos ya jugaron
       stageDeadlines[stage] = stageMatches.length > 0 && stageMatches.every(m => m.is_played);
     } else {
       const first = stageMatches.sort((a, b) => new Date(a.scheduled_at).getTime() - new Date(b.scheduled_at).getTime())[0];
