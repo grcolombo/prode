@@ -50,7 +50,7 @@ export async function savePrediction(matchId: number, homeScore: number, awaySco
     if (now >= GROUP_DEADLINE) {
       return { error: "El fixture de grupos está cerrado." };
     }
-  } else {
+  } else if (!isRezagado) {
     // Fases eliminatorias: abierto si estamos dentro de la gracia, sino deadline = primer partido de la fase
     if (now >= KNOCKOUT_GRACE) {
       const { data: firstMatch } = await supabase
@@ -66,6 +66,7 @@ export async function savePrediction(matchId: number, homeScore: number, awaySco
       }
     }
   }
+  // Rezagados: sin restricción de deadline en fases eliminatorias
 
   const { error } = await supabase.from("predictions").upsert(
     {
