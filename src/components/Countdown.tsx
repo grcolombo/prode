@@ -47,7 +47,7 @@ export default function Countdown() {
   if (isExpired) {
     return (
       <p className="text-brand-300 font-semibold text-base tracking-wide">
-        ¡El Mundial ya comenzó · Pronósticos cerrados!
+        ⚽ ¡El Mundial está en marcha! Pronosticá los cruces de eliminación
       </p>
     );
   }
